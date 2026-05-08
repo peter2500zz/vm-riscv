@@ -11,19 +11,18 @@ typedef struct {
 
 
 VM *vm_new(size_t n) {
-        size_t size = 1 << n; // 2^n
+        size_t size = (size_t)1 << n; // 2^n
 
-        // 清空区域并分配内存
         VM *vm = calloc(1, sizeof(VM));
         if (vm == NULL) {
-                printf("Failed to allocate memory for VM\n");
+                fprintf(stderr, "Failed to allocate memory for VM\n");
                 goto out;
         }
         vm->pc = 0;
         vm->mem_size = size;
-        vm->mem = malloc(size * sizeof(uint8_t));
+        vm->mem = calloc(1, size);
         if (vm->mem == NULL) {
-                printf("Failed to allocate memory for VM memory\n");
+                fprintf(stderr, "Failed to allocate memory for VM memory\n");
                 goto out_free_vm;
         }
 
@@ -47,21 +46,40 @@ int vm_load(VM *vm, const char *filename) {
         int result = 0;
         FILE *fp = fopen(filename, "rb");
         if (fp == NULL) {
-                printf("Failed to open file: %s\n", filename);
+                fprintf(stderr, "Failed to open file: %s\n", filename);
                 result = 1;
                 goto out;
         }
 
-        size_t index = 0;
-        uint8_t byte;
-        while (fread(&byte, sizeof(uint8_t), 1, fp) == 1) {
-                if (index >= vm->mem_size) {
-                        printf("File is too large to fit in VM memory\n");
-                        result = 1;
-                        goto out_close_file;
-                }
-                vm->mem[index] = byte;
-                index++;
+        fseek(fp, 0, SEEK_END);
+        long file_size = ftell(fp);
+        if (file_size < 0) {
+                fprintf(stderr, "Failed to get file size\n");
+                result = 1;
+                goto out_close_file;
+        }
+        fseek(fp, 0, SEEK_SET);
+
+        if ((size_t)file_size > vm->mem_size) {
+                fprintf(
+                        stderr, 
+                        "File size (%ld bytes) exceeds VM memory size (%zu bytes)\n", 
+                        file_size, vm->mem_size
+                );
+                result = 1;
+                goto out_close_file;
+        }
+
+        size_t bytes_read = fread(
+                vm->mem, 
+                1, 
+                (size_t)file_size, 
+                fp
+        );
+        if (bytes_read != (size_t)file_size) {
+                fprintf(stderr, "Failed to read file\n");
+                result = 1;
+                goto out_close_file;
         }
 
 out_close_file:
@@ -95,6 +113,7 @@ int main(int argc, char *argv[]) {
 
 out_free_vm:
         vm_free(vm);
+        vm = NULL;
 out:
         return result;
 }
