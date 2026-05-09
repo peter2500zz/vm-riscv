@@ -81,7 +81,55 @@ Instruction vm_fetch(VM *vm) {
         return inst;
 }
 
+int vm_exec(Instruction inst) {
+        uint32_t opcode = inst_opcode(inst);
+
+        switch (opcode) {
+        // U LUI
+        case 0b0110111:
+                break;
+        // U AUIPC
+        case 0b0010111:
+                break;
+        // J JAL
+        case 0b1101111:
+                break;
+        // I JALR
+        case 0b1100111:
+                break;
+        // B
+        case 0b1100011:
+                break;
+        // I
+        case 0b0000011:
+                break;
+        // S
+        case 0b0100011:
+                break;
+        // I
+        case 0b0010011:
+                break;
+        // R
+        case 0b0110011:
+                break;
+        // I
+        case 0b0001111:
+                break;
+        // I
+        case 0b1110011:
+                break;
+        default:
+                return 1;
+        }
+
+        return 0;
+}
+
 void vm_step(VM *vm) {
         Instruction inst = vm_fetch(vm);
         printf("opcode: 0x%08X\n", inst_opcode(inst));
+        
+        if (vm_exec(inst) != 0) {
+                fprintf(stderr, "Unknown opcode\n");
+        }
 }

@@ -29,7 +29,7 @@ int32_t inst_imm_s(Instruction inst) {
 }
 
 int32_t inst_imm_b(Instruction inst) {
-        return sign_extend(BITS(inst, 31, 31) << 12 | BITS(inst, 7, 7) << 11 |
+        return sign_extend(BIT(inst, 31) << 12 | BIT(inst, 7) << 11 |
                                BITS(inst, 30, 25) << 5 | BITS(inst, 11, 8) << 1,
                            13);
 }
@@ -39,8 +39,7 @@ int32_t inst_imm_u(Instruction inst) {
 }
 
 int32_t inst_imm_j(Instruction inst) {
-        return sign_extend(BITS(inst, 31, 31) << 20 | BITS(inst, 19, 12) << 12 |
-                               BITS(inst, 20, 20) << 11 |
-                               BITS(inst, 30, 21) << 1,
+        return sign_extend(BIT(inst, 31) << 20 | BITS(inst, 19, 12) << 12 |
+                               BIT(inst, 20) << 11 | BITS(inst, 30, 21) << 1,
                            21);
 }
