@@ -24,3 +24,6 @@ target_compile_options(vm PRIVATE
         -Wundef
         -pedantic
 )
+
+enable_testing()
+add_subdirectory(tests)

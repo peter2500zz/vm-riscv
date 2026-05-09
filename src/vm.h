@@ -8,7 +8,7 @@
 #define VM_REG_NUM 32
 
 typedef struct {
-        uint32_t pc;
+        uint32_t _pc;
         uint32_t pc_next;
         uint32_t _regs[VM_REG_NUM];
         uint32_t mem_size;
@@ -39,6 +39,28 @@ void vm_free(VM *vm);
  * @param vm 虚拟机实例指针
  */
 void vm_debug(VM *vm);
+
+/**
+ * @brief 读取PC寄存器的值
+ *
+ * @param vm 虚拟机实例指针
+ * @return PC寄存器的值
+ */
+static inline uint32_t vm_pc_read(VM *vm) {
+        return vm->_pc;
+}
+
+/**
+ * @brief 将值写入PC寄存器
+ *
+ * @param vm 虚拟机实例指针
+ * @param value 写入PC寄存器的值
+ * 
+ * @note 自动根据虚拟机实例内存大小环绕
+ */
+static inline void vm_pc_write(VM *vm, uint32_t value) {
+        vm->_pc = value % vm->mem_size;
+}
 
 /**
  * @brief 从指定寄存器中读取值
@@ -88,6 +110,17 @@ int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size);
  * @return 从内存中获取的指令
  */
 Instruction vm_fetch(VM *vm);
+
+/**
+ * @brief 执行一条指令，并改变pc
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ * @return 是否执行成功
+ *
+ * @note 执行失败pc不变
+ */
+int vm_exec(VM *vm, Instruction inst);
 
 /**
  * @brief 执行pc指向的指令

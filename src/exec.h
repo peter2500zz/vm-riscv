@@ -33,8 +33,8 @@ void exec_auipc(VM *vm, Instruction inst);
  * JAL把跟在JAL之后的指令的地址（pc+4）存储到寄存器rd中。
  * 标准软件调用约定使用 x1作为返回地址寄存器，使用 x5作为备选的链接寄存器。
  * 
- * @param vm 
- * @param inst 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
  */
 void exec_jal(VM *vm, Instruction inst);
 
@@ -45,11 +45,20 @@ void exec_jal(VM *vm, Instruction inst);
  * 紧接着跳转的指令的地址（pc+4）被写入寄存器 rd。
  * 如果不需要结果，寄存器 x0也可以被用作目的寄存器。
  * 
- * @param vm 
- * @param inst 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
  */
 void exec_jalr(VM *vm, Instruction inst);
 
+/**
+ * @brief
+ * ADDI 将符号扩展的12位立即数加到寄存器rs1上。
+ * 简单地将结果的低XLEN位当作结果，而忽略了算数溢出。
+ * ADDI rd, rs1, 0 被用于实现 MV rd, rs1 汇编器伪指令。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
 void exec_addi(VM *vm, Instruction inst);
 
 #endif // EXEC_H

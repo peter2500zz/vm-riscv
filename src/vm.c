@@ -14,13 +14,16 @@ const char *reg_name[] = {"zero", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
                           "s8",   "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 VM *vm_new(int n) {
-        uint32_t size = (uint32_t)(1 << n); // 2^n
+        // 越界
+        if (n < 0 || n > 31) {
+                goto out;
+        }
+        uint32_t size = (uint32_t)1 << n; // 2^n
 
         VM *vm = calloc(1, sizeof(VM));
         if (vm == NULL) {
                 goto out;
         }
-        vm->pc = 0;
         vm->mem_size = size;
         vm->mem = calloc(1, size);
         if (vm->mem == NULL) {
@@ -46,7 +49,7 @@ void vm_free(VM *vm) {
 void vm_debug(VM *vm) {
         printf("===== VM stats =====\n");
         printf("Memsize: %d\n", vm->mem_size);
-        printf("pc: %d\n", vm->pc);
+        printf("pc: %d\n", vm_pc_read(vm));
         for (uint32_t i = 0; i < VM_REG_NUM; i++) {
                 printf("%s: 0x%08X\n", reg_name[i], vm_reg_read(vm, i));
         }
@@ -65,25 +68,16 @@ int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size) {
 
 Instruction vm_fetch(VM *vm) {
         Instruction inst =
-            (Instruction)(vm->mem[(vm->pc) % vm->mem_size] |
-                          (vm->mem[(vm->pc + 1) % vm->mem_size] << 8) |
-                          (vm->mem[(vm->pc + 2) % vm->mem_size] << 16) |
-                          (vm->mem[(vm->pc + 3) % vm->mem_size] << 24));
+            (Instruction)(vm->mem[(vm_pc_read(vm)) % vm->mem_size] |
+                          (vm->mem[(vm_pc_read(vm) + 1) % vm->mem_size] << 8) |
+                          (vm->mem[(vm_pc_read(vm) + 2) % vm->mem_size] << 16) |
+                          (vm->mem[(vm_pc_read(vm) + 3) % vm->mem_size] << 24));
 
         return inst;
 }
 
-/**
- * @brief 执行一条指令，并改变pc
- *
- * @param vm 虚拟机实例指针
- * @param inst 指令
- * @return 是否执行成功
- *
- * @note 执行失败pc不变
- */
 int vm_exec(VM *vm, Instruction inst) {
-        vm->pc_next = vm->pc + 4;
+        vm->pc_next = vm_pc_read(vm) + 4;
 
         uint32_t opcode = inst_opcode(inst);
         uint32_t rd = inst_rd(inst);
@@ -363,7 +357,7 @@ int vm_exec(VM *vm, Instruction inst) {
         return 1;
 
 done:
-        vm->pc = vm->pc_next;
+        vm_pc_write(vm, vm->pc_next);
 
         return 0;
 }
