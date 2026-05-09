@@ -3,8 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "exec.h"
 #include "instruction.h"
 #include "vm.h"
+
+const char *reg_name[] = {"zero", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
+                          "s0",   "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
+                          "a6",   "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
+                          "s8",   "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 VM *vm_new(int n) {
         uint32_t size = (uint32_t)(1 << n); // 2^n
@@ -41,7 +47,7 @@ void vm_debug(VM *vm) {
         printf("Memsize: %d\n", vm->mem_size);
         printf("pc: %d\n", vm->pc);
         for (uint32_t i = 0; i < VM_REG_NUM; i++) {
-                printf("x%d: 0x%08X\n", i, vm_reg_read(vm, i));
+                printf("%s: 0x%08X\n", reg_name[i], vm_reg_read(vm, i));
         }
         printf("===== End =====\n");
 }
@@ -92,7 +98,7 @@ Instruction vm_fetch(VM *vm) {
         return inst;
 }
 
-int vm_exec(Instruction inst) {
+int vm_exec(VM *vm, Instruction inst) {
         uint32_t opcode = inst_opcode(inst);
         uint32_t rd = inst_rd(inst);
         uint32_t funct3 = inst_funct3(inst);
@@ -179,7 +185,9 @@ int vm_exec(Instruction inst) {
                 // I 6
                 // ADDI
                 case 0x0: // 0b000
-                        break;
+                        exec_addi(vm, inst);
+
+                        goto done;
                 // SLTI
                 case 0x2: // 0b010
                         break;
@@ -356,10 +364,11 @@ int vm_exec(Instruction inst) {
                 }
 
                 break;
-        default:
-                return 1;
         }
 
+        return 1;
+
+done:
         return 0;
 }
 
@@ -367,7 +376,7 @@ void vm_step(VM *vm) {
         Instruction inst = vm_fetch(vm);
         printf("opcode: 0x%08X\n", inst_opcode(inst));
 
-        if (vm_exec(inst) != 0) {
+        if (vm_exec(vm, inst) != 0) {
                 fprintf(stderr, "Unknown opcode\n");
         }
 }
