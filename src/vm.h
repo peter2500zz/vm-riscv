@@ -6,9 +6,11 @@
 
 #include "instruction.h"
 
+#define VM_REG_NUM 32
+
 typedef struct {
         uint32_t pc;
-        uint32_t regs[32];
+        uint32_t _regs[VM_REG_NUM];
         uint32_t mem_size;
         uint8_t *mem;
 } VM;
@@ -30,6 +32,43 @@ VM *vm_new(int n);
  * @note 无论vm是否为NULL，函数都能安全调用
  */
 void vm_free(VM *vm);
+
+/**
+ * @brief 将当前虚拟机状态打印到标准输出
+ *
+ * @param vm 虚拟机实例指针
+ */
+void vm_debug(VM *vm);
+
+/**
+ * @brief 从指定寄存器中读取值
+ *
+ * @param vm 虚拟机实例指针
+ * @param reg_num 寄存器编号
+ * @return 寄存器中的值
+ */
+static inline uint32_t vm_reg_read(VM *vm, uint32_t reg_num) {
+        // x0寄存器始终为0
+        if (reg_num == 0) {
+                return 0;
+        }
+        return vm->_regs[reg_num];
+}
+
+/**
+ * @brief 将值写入指定寄存器
+ *
+ * @param vm 虚拟机实例指针
+ * @param reg_num 寄存器编号
+ * @param value 写入寄存器的值
+ */
+static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
+        // x0寄存器始终为0
+        if (reg_num == 0) {
+                return;
+        }
+        vm->_regs[reg_num] = value;
+}
 
 /**
  * @brief 从文件加载数据到虚拟机内存

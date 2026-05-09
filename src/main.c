@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 
         printf("Doing something with the VM...\n");
         vm_step(vm);
+        vm_debug(vm);
 
 out_free_vm:
         vm_free(vm);
