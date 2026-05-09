@@ -92,13 +92,21 @@ Instruction vm_fetch(VM *vm) {
                           (vm->mem[(vm->pc + 2) % vm->mem_size] << 16) |
                           (vm->mem[(vm->pc + 3) % vm->mem_size] << 24));
 
-        // 循环地址
-        vm->pc = (vm->pc + 4) % vm->mem_size;
-
         return inst;
 }
 
+/**
+ * @brief 执行一条指令，并改变pc
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ * @return 是否执行成功
+ * 
+ * @note 执行失败pc不变
+ */
 int vm_exec(VM *vm, Instruction inst) {
+        vm->pc_next = vm->pc + 4;
+
         uint32_t opcode = inst_opcode(inst);
         uint32_t rd = inst_rd(inst);
         uint32_t funct3 = inst_funct3(inst);
@@ -109,13 +117,19 @@ int vm_exec(VM *vm, Instruction inst) {
         switch (opcode) {
         // U LUI
         case 0x37: // 0b0110111
-                break;
+                exec_lui(vm, inst);
+
+                goto done;
         // U AUIPC
         case 0x17: // 0b0010111
-                break;
+                exec_auipc(vm, inst);
+
+                goto done;
         // J JAL
         case 0x6f: // 0b1101111
-                break;
+                exec_jal(vm, inst);
+
+                goto done;
         // I JALR
         case 0x67: // 0b1100111
                 break;
@@ -369,6 +383,8 @@ int vm_exec(VM *vm, Instruction inst) {
         return 1;
 
 done:
+        vm->pc = vm->pc_next;
+
         return 0;
 }
 

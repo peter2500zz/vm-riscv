@@ -2,7 +2,6 @@
 #define VM_H
 
 #include <stdint.h>
-#include <stdlib.h>
 
 #include "instruction.h"
 
@@ -10,6 +9,7 @@
 
 typedef struct {
         uint32_t pc;
+        uint32_t pc_next;
         uint32_t _regs[VM_REG_NUM];
         uint32_t mem_size;
         uint8_t *mem;
@@ -82,15 +82,18 @@ static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
 int vm_load(VM *vm, const char *filename);
 
 /**
- * @brief 从虚拟机内存中获取PC指向的一条指令
+ * @brief 从虚拟机内存中获取PC指向的指令
  *
  * @param vm 虚拟机实例指针
  * @return 从内存中获取的指令
- *
- * @note PC自动增加4字节
  */
 Instruction vm_fetch(VM *vm);
 
+/**
+ * @brief 执行pc指向的指令
+ * 
+ * @param vm 虚拟机实例指针
+ */
 void vm_step(VM *vm);
 
 #endif // VM_H

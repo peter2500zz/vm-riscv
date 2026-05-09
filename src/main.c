@@ -27,7 +27,26 @@ int main(int argc, char *argv[]) {
         }
 
         printf("Doing something with the VM...\n");
-        vm_step(vm);
+
+        while (1) {
+                int input = getchar();
+                while (getchar() != '\n');
+
+                switch (input) {
+                case 'q':
+                        goto out_free_vm;
+                case 'd':
+                        vm_debug(vm);
+                        break;
+                case 's':
+                        vm_step(vm);
+                        break;
+                default:
+                        printf("Unknown command: %c\n", input);
+                        break;
+                }
+        }
+
         vm_debug(vm);
 
 out_free_vm:
