@@ -1,14 +1,17 @@
 #ifndef TEST_UTILS_H
 #define TEST_UTILS_H
 
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "../src/vm.h"
 
 #define ASSERT_EQ(actual, expected)                                            \
         if ((actual) != (expected)) {                                          \
-                printf("FAIL: %s:%d — got %d, expected %d\n", __FILE__,        \
-                       __LINE__, actual, expected);                            \
+                printf("FAIL: %s:%d — got %" PRIu32 ", expected %" PRIu32      \
+                       "\n",                                                   \
+                       __FILE__, __LINE__, (uint32_t)(actual),                 \
+                       (uint32_t)(expected));                                  \
                 return 1;                                                      \
         } else {                                                               \
                 printf("PASS: %s:%d\n", __FILE__, __LINE__);                   \
