@@ -3,8 +3,6 @@
 
 #include "vm.h"
 
-
-
 int main(int argc, char *argv[]) {
         int result = 0;
 
@@ -29,6 +27,7 @@ int main(int argc, char *argv[]) {
         }
 
         printf("Doing something with the VM...\n");
+        vm_step(vm);
 
 out_free_vm:
         vm_free(vm);
