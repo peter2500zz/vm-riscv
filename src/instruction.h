@@ -60,7 +60,7 @@ uint32_t inst_funct7(Instruction inst);
  * @brief 获取I型指令的立即数
  *
  * @param inst 指令
- * @return 立即数
+ * @return 12位立即数
  */
 int32_t inst_imm_i(Instruction inst);
 
@@ -68,7 +68,7 @@ int32_t inst_imm_i(Instruction inst);
  * @brief 获取S型指令的立即数
  *
  * @param inst 指令
- * @return 立即数
+ * @return 12位立即数
  */
 int32_t inst_imm_s(Instruction inst);
 
@@ -76,7 +76,7 @@ int32_t inst_imm_s(Instruction inst);
  * @brief 获取B型指令的立即数
  *
  * @param inst 指令
- * @return 立即数
+ * @return 13位立即数
  */
 int32_t inst_imm_b(Instruction inst);
 
@@ -84,7 +84,7 @@ int32_t inst_imm_b(Instruction inst);
  * @brief 获取U型指令的立即数
  *
  * @param inst 指令
- * @return 立即数
+ * @return 20位立即数
  */
 int32_t inst_imm_u(Instruction inst);
 
@@ -92,7 +92,7 @@ int32_t inst_imm_u(Instruction inst);
  * @brief 获取J型指令的立即数
  *
  * @param inst 指令
- * @return 立即数
+ * @return 21位立即数
  */
 int32_t inst_imm_j(Instruction inst);
 
