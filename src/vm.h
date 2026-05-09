@@ -79,7 +79,7 @@ static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
  *
  * @warning 文件大小如果超过虚拟机内存大小，将失败
  */
-int vm_load(VM *vm, const char *filename);
+int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size);
 
 /**
  * @brief 从虚拟机内存中获取PC指向的指令
@@ -91,7 +91,7 @@ Instruction vm_fetch(VM *vm);
 
 /**
  * @brief 执行pc指向的指令
- * 
+ *
  * @param vm 虚拟机实例指针
  */
 void vm_step(VM *vm);

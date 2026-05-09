@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "exec.h"
 #include "instruction.h"
@@ -52,37 +53,14 @@ void vm_debug(VM *vm) {
         printf("===== End =====\n");
 }
 
-int vm_load(VM *vm, const char *filename) {
-        int result = 0;
-        FILE *fp = fopen(filename, "rb");
-        if (fp == NULL) {
-                result = 1;
-                goto out;
+int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size) {
+        if (offset >= vm->mem_size || vm->mem_size - offset < size) {
+                return 1;
         }
 
-        fseek(fp, 0, SEEK_END);
-        size_t file_size = (size_t)ftell(fp);
-        if (file_size < 0) {
-                result = 1;
-                goto out_close_file;
-        }
-        fseek(fp, 0, SEEK_SET);
+        memcpy(vm->mem + offset, buffer, size);
 
-        if ((uint32_t)file_size > vm->mem_size) {
-                result = 1;
-                goto out_close_file;
-        }
-
-        size_t bytes_read = fread(vm->mem, 1, file_size, fp);
-        if (bytes_read != file_size) {
-                result = 1;
-                goto out_close_file;
-        }
-
-out_close_file:
-        fclose(fp);
-out:
-        return result;
+        return 0;
 }
 
 Instruction vm_fetch(VM *vm) {
@@ -97,11 +75,11 @@ Instruction vm_fetch(VM *vm) {
 
 /**
  * @brief 执行一条指令，并改变pc
- * 
+ *
  * @param vm 虚拟机实例指针
  * @param inst 指令
  * @return 是否执行成功
- * 
+ *
  * @note 执行失败pc不变
  */
 int vm_exec(VM *vm, Instruction inst) {
@@ -132,7 +110,9 @@ int vm_exec(VM *vm, Instruction inst) {
                 goto done;
         // I JALR
         case 0x67: // 0b1100111
-                break;
+                exec_jalr(vm, inst);
+
+                goto done;
         // B 6
         case 0x63: // 0b1100011
                 switch (funct3) {

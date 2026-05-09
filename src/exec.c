@@ -26,6 +26,15 @@ void exec_jal(VM *vm, Instruction inst) {
         vm->pc_next = vm->pc + (uint32_t)imm_j;
 }
 
+void exec_jalr(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        vm_reg_write(vm, rd, vm->pc_next);
+        vm->pc_next = vm_reg_read(vm, rs1) + (uint32_t)imm_i;
+}
+
 void exec_addi(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);
         uint32_t rs1 = inst_rs1(inst);

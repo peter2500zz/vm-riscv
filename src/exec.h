@@ -38,6 +38,18 @@ void exec_auipc(VM *vm, Instruction inst);
  */
 void exec_jal(VM *vm, Instruction inst);
 
+/**
+ * @brief
+ * 间接跳转指令JALR（跳转和链接寄存器）使用I类型编码。
+ * 通过把符号扩展的12位I立即数加到寄存器rs1来获得目标地址，然后把结果的最低有效位设置为零。
+ * 紧接着跳转的指令的地址（pc+4）被写入寄存器 rd。
+ * 如果不需要结果，寄存器 x0也可以被用作目的寄存器。
+ * 
+ * @param vm 
+ * @param inst 
+ */
+void exec_jalr(VM *vm, Instruction inst);
+
 void exec_addi(VM *vm, Instruction inst);
 
 #endif // EXEC_H
