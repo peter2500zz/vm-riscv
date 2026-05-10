@@ -146,6 +146,36 @@ void exec_lhu(VM *vm, Instruction inst) {
         vm_reg_write(vm, rd, (uint32_t)*vm_mem_ptr_half(vm, addr));
 }
 
+void exec_sb(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_s = inst_imm_s(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_s);
+
+        *vm_mem_ptr_byte(vm, addr) = (uint8_t)vm_reg_read(vm, rs2);
+}
+
+void exec_sh(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_s = inst_imm_s(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_s);
+
+        *vm_mem_ptr_half(vm, addr) = (uint16_t)vm_reg_read(vm, rs2);
+}
+
+void exec_sw(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_s = inst_imm_s(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_s);
+
+        *vm_mem_ptr_word(vm, addr) = vm_reg_read(vm, rs2);
+}
+
 void exec_addi(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);
         uint32_t rs1 = inst_rs1(inst);

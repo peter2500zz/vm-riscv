@@ -175,13 +175,19 @@ int vm_exec(VM *vm, Instruction inst) {
                 switch (funct3) {
                 // SB
                 case 0x0: // 0b000
-                        break;
+                        exec_sb(vm, inst);
+
+                        goto done;
                 // SH
                 case 0x1: // 0b001
-                        break;
+                        exec_sh(vm, inst);
+
+                        goto done;
                 // SW
                 case 0x2: // 0b010
-                        break;
+                        exec_sw(vm, inst);
+
+                        goto done;
                 }
 
                 break;

@@ -178,6 +178,39 @@ void exec_lbu(VM *vm, Instruction inst);
 void exec_lhu(VM *vm, Instruction inst);
 
 /**
+ * @brief 
+ * 存储指令被编码为S类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * SB指令从寄存器rs2的低位将8位的值存储到内存。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sb(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 存储指令被编码为S类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * SH指令从寄存器rs2的低位将16位的值存储到内存。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sh(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 存储指令被编码为S类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * SW指令从寄存器rs2的低位将32位的值存储到内存。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sw(VM *vm, Instruction inst);
+
+/**
  * @brief
  * ADDI 将符号扩展的12位立即数加到寄存器rs1上。
  * 简单地将结果的低XLEN位当作结果，而忽略了算数溢出。
