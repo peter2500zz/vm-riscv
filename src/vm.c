@@ -112,22 +112,34 @@ int vm_exec(VM *vm, Instruction inst) {
                 switch (funct3) {
                 // BEQ
                 case 0x0: // 0b000
-                        break;
+                        exec_beq(vm, inst);
+
+                        goto done;
                 // BNE
                 case 0x1: // 0b001
-                        break;
+                        exec_bne(vm, inst);
+
+                        goto done;
                 // BLT
                 case 0x4: // 0b100
-                        break;
+                        exec_blt(vm, inst);
+
+                        goto done;
                 // BGE
                 case 0x5: // 0b101
-                        break;
+                        exec_bge(vm, inst);
+
+                        goto done;
                 // BLTU
                 case 0x6: // 0b110
-                        break;
+                        exec_bltu(vm, inst);
+
+                        goto done;
                 // BGEU
                 case 0x7: // 0b111
-                        break;
+                        exec_bgeu(vm, inst);
+
+                        goto done;
                 }
 
                 break;

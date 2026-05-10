@@ -36,6 +36,66 @@ void exec_jalr(VM *vm, Instruction inst) {
         vm->pc_next = target;
 }
 
+void exec_beq(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if (vm_reg_read(vm, rs1) == vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
+void exec_bne(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if (vm_reg_read(vm, rs1) != vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
+void exec_blt(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if ((int32_t)vm_reg_read(vm, rs1) < (int32_t)vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
+void exec_bltu(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if (vm_reg_read(vm, rs1) < vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
+void exec_bge(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if ((int32_t)vm_reg_read(vm, rs1) >= (int32_t)vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
+void exec_bgeu(VM *vm, Instruction inst) {
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+        int32_t imm_b = inst_imm_b(inst);
+
+        if (vm_reg_read(vm, rs1) >= vm_reg_read(vm, rs2)) {
+                vm->pc_next = vm_pc_read(vm) + (uint32_t)imm_b;
+        }
+}
+
 void exec_addi(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);
         uint32_t rs1 = inst_rs1(inst);
