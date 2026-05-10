@@ -96,6 +96,56 @@ void exec_bgeu(VM *vm, Instruction inst) {
         }
 }
 
+void exec_lb(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_i);
+
+        vm_reg_write(vm, rd, (uint32_t)(int8_t)*vm_mem_ptr_byte(vm, addr));
+}
+
+void exec_lh(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_i);
+
+        vm_reg_write(vm, rd, (uint32_t)(int16_t)*vm_mem_ptr_half(vm, addr));
+}
+
+void exec_lw(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_i);
+
+        vm_reg_write(vm, rd, *vm_mem_ptr_word(vm, addr));
+}
+
+void exec_lbu(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_i);
+
+        vm_reg_write(vm, rd, (uint32_t)*vm_mem_ptr_byte(vm, addr));
+}
+
+void exec_lhu(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t addr = (uint32_t)((int32_t)vm_reg_read(vm, rs1) + imm_i);
+
+        vm_reg_write(vm, rd, (uint32_t)*vm_mem_ptr_half(vm, addr));
+}
+
 void exec_addi(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);
         uint32_t rs1 = inst_rs1(inst);

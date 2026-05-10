@@ -24,4 +24,13 @@
                 return 1;                                                      \
         }
 
+#define FILL_VM(...)                                                       \
+        do {                                                                   \
+                uint32_t _buf[] = {__VA_ARGS__};                               \
+                if (vm_load(vm, 0x0, (uint8_t *)_buf, sizeof(_buf)) != 0) {   \
+                        printf("FAIL: vm_load failed\n");                      \
+                        return 1;                                              \
+                }                                                              \
+        } while (0)
+
 #endif // TEST_UTILS_H

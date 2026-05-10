@@ -123,6 +123,61 @@ void exec_bge(VM *vm, Instruction inst);
 void exec_bgeu(VM *vm, Instruction inst);
 
 /**
+ * @brief 
+ * 加载指令被编码为I类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * LB先从内存加载一个8位的值，然后在存储到rd中之前，把它符号扩展到32位。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_lb(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 加载指令被编码为I类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * LH先从内存加载一个16位的值，然后在存储到rd中之前，把它符号扩展到32位。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_lh(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 加载指令被编码为I类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * LW指令从内存加载一个32位的值到rd。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_lw(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 加载指令被编码为I类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * LBU先从内存加载一个8位的值，然后，在存储到rd中之前，把它用零扩展到32位。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_lbu(VM *vm, Instruction inst);
+
+/**
+ * @brief 
+ * 加载指令被编码为I类型格式。
+ * 通过把寄存器rs1加到符号扩展的12位偏移量，可以获得有效地址。
+ * LHU先从内存加载一个16位的值，然后，在存储到rd中之前，把它用零扩展到32位。
+ * 
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_lhu(VM *vm, Instruction inst);
+
+/**
  * @brief
  * ADDI 将符号扩展的12位立即数加到寄存器rs1上。
  * 简单地将结果的低XLEN位当作结果，而忽略了算数溢出。
