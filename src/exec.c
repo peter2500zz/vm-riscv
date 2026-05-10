@@ -266,3 +266,102 @@ void exec_srai(VM *vm, Instruction inst) {
         vm_reg_write(vm, rd,
                      (uint32_t)((int32_t)vm_reg_read(vm, rs1) >> offset));
 }
+
+void exec_add(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) + vm_reg_read(vm, rs2));
+}
+
+void exec_sub(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) - vm_reg_read(vm, rs2));
+}
+
+void exec_sll(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        uint32_t offset = vm_reg_read(vm, rs2) & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) << offset);
+}
+
+void exec_slt(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        uint32_t value = 0;
+
+        if ((int32_t)vm_reg_read(vm, rs1) < (int32_t)vm_reg_read(vm, rs2)) {
+                value = 1;
+        }
+
+        vm_reg_write(vm, rd, value);
+}
+
+void exec_sltu(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        uint32_t value = 0;
+
+        if (vm_reg_read(vm, rs1) < vm_reg_read(vm, rs2)) {
+                value = 1;
+        }
+
+        vm_reg_write(vm, rd, value);
+}
+
+void exec_xor(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) ^ vm_reg_read(vm, rs2));
+}
+
+void exec_srl(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        uint32_t offset = vm_reg_read(vm, rs2) & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) >> offset);
+}
+
+void exec_sra(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        uint32_t offset = vm_reg_read(vm, rs2) & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd,
+                     (uint32_t)((int32_t)vm_reg_read(vm, rs1) >> offset));
+}
+
+void exec_or(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) | vm_reg_read(vm, rs2));
+}
+
+void exec_and(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        uint32_t rs2 = inst_rs2(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) & vm_reg_read(vm, rs2));
+}

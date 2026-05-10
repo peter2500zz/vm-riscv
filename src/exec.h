@@ -298,4 +298,96 @@ void exec_srli(VM *vm, Instruction inst);
  */
 void exec_srai(VM *vm, Instruction inst);
 
+/**
+ * @brief
+ * ADD执行rs1和rs2的相加。
+ * 忽略结果的溢出，并把结果的低XLEN位写入目的寄存器rd。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_add(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SUB执行从rs1中减去rs2。
+ * 忽略结果的溢出，并把结果的低XLEN位写入目的寄存器rd。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sub(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SLL对寄存器rs1中的值执行逻辑左移，移位的数目保持在寄存器rs2的低5位中。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sll(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SLT执行有符号的比较，如果rs1<rs2，向rd写入1，否则写入0。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_slt(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SLTU执行无符号的比较，如果rs1<rs2，向rd写入1，否则写入0。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sltu(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * XOR对寄存器rs1和rs2中的值执行按位异或，并把结果写入rd。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_xor(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SRL对寄存器rs1中的值执行逻辑右移，移位的数目保持在寄存器rs2的低5位中。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_srl(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * SRA对寄存器rs1中的值执行算术右移，移位的数目保持在寄存器rs2的低5位中。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_sra(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * OR对寄存器rs1和rs2中的值执行按位或，并把结果写入rd。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_or(VM *vm, Instruction inst);
+
+/**
+ * @brief
+ * AND对寄存器rs1和rs2中的值执行按位与，并把结果写入rd。
+ *
+ * @param vm 虚拟机实例指针
+ * @param inst 指令
+ */
+void exec_and(VM *vm, Instruction inst);
+
 #endif // EXEC_H

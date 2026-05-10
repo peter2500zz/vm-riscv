@@ -261,10 +261,14 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // ADD
                         case 0x0: // 0b0000000
-                                break;
+                                exec_add(vm, inst);
+
+                                goto done;
                         // SUB
                         case 0x20: // 0b0100000
-                                break;
+                                exec_sub(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -272,7 +276,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLL
                         case 0x0: // 0b0000000
-                                break;
+                                exec_sll(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -280,7 +286,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLT
                         case 0x0: // 0b0000000
-                                break;
+                                exec_slt(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -288,7 +296,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLTU
                         case 0x0: // 0b0000000
-                                break;
+                                exec_sltu(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -296,7 +306,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // XOR
                         case 0x0: // 0b0000000
-                                break;
+                                exec_xor(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -304,10 +316,14 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SRL
                         case 0x0: // 0b0000000
-                                break;
+                                exec_srl(vm, inst);
+
+                                goto done;
                         // SRA
                         case 0x20: // 0b0100000
-                                break;
+                                exec_sra(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -315,7 +331,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // OR
                         case 0x0: // 0b0000000
-                                break;
+                                exec_or(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -323,7 +341,9 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // AND
                         case 0x0: // 0b0000000
-                                break;
+                                exec_and(vm, inst);
+
+                                goto done;
                         }
 
                         break;
