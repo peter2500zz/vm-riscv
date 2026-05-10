@@ -202,25 +202,37 @@ int vm_exec(VM *vm, Instruction inst) {
                         goto done;
                 // SLTI
                 case 0x2: // 0b010
-                        break;
+                        exec_slti(vm, inst);
+
+                        goto done;
                 // SLTIU
                 case 0x3: // 0b011
-                        break;
+                        exec_sltiu(vm, inst);
+
+                        goto done;
                 // XORI
                 case 0x4: // 0b100
-                        break;
+                        exec_xori(vm, inst);
+
+                        goto done;
                 // ORI
                 case 0x6: // 0b110
-                        break;
+                        exec_ori(vm, inst);
+
+                        goto done;
                 // ANDI
                 case 0x7: // 0b111
-                        break;
+                        exec_andi(vm, inst);
+
+                        goto done;
                 // R 3
                 case 0x1: // 0b001
                         switch (funct7) {
                         // SLLI
                         case 0x0: // 0b0000000
-                                break;
+                                exec_slli(vm, inst);
+
+                                goto done;
                         }
 
                         break;
@@ -228,10 +240,14 @@ int vm_exec(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SRLI
                         case 0x0: // 0b0000000
-                                break;
+                                exec_srli(vm, inst);
+
+                                goto done;
                         // SRAI
                         case 0x20: // 0b0100000
-                                break;
+                                exec_srai(vm, inst);
+
+                                goto done;
                         }
 
                         break;

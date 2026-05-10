@@ -183,3 +183,86 @@ void exec_addi(VM *vm, Instruction inst) {
 
         vm_reg_write(vm, rd, vm_reg_read(vm, rs1) + (uint32_t)imm_i);
 }
+
+void exec_slti(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t value = 0;
+
+        if ((int32_t)vm_reg_read(vm, rs1) < imm_i) {
+                value = 1;
+        }
+
+        vm_reg_write(vm, rd, value);
+}
+
+void exec_sltiu(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t value = 0;
+
+        if (vm_reg_read(vm, rs1) < (uint32_t)imm_i) {
+                value = 1;
+        }
+
+        vm_reg_write(vm, rd, value);
+}
+
+void exec_andi(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) & (uint32_t)imm_i);
+}
+
+void exec_ori(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) | (uint32_t)imm_i);
+}
+
+void exec_xori(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) ^ (uint32_t)imm_i);
+}
+
+void exec_slli(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t offset = imm_i & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) << offset);
+}
+
+void exec_srli(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        uint32_t offset = imm_i & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd, vm_reg_read(vm, rs1) >> offset);
+}
+
+void exec_srai(VM *vm, Instruction inst) {
+        uint32_t rd = inst_rd(inst);
+        uint32_t rs1 = inst_rs1(inst);
+        int32_t imm_i = inst_imm_i(inst);
+
+        int32_t offset = imm_i & 0x1F; // 0b11111
+
+        vm_reg_write(vm, rd,
+                     (uint32_t)((int32_t)vm_reg_read(vm, rs1) >> offset));
+}
