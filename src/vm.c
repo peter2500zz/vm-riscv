@@ -25,8 +25,8 @@ VM *vm_new(int n) {
                 goto out;
         }
         vm->mem_size = size;
-        vm->mem = calloc(1, size);
-        if (vm->mem == NULL) {
+        vm->_mem = calloc(1, size);
+        if (vm->_mem == NULL) {
                 goto out_free_vm;
         }
 
@@ -42,7 +42,7 @@ void vm_free(VM *vm) {
         if (vm == NULL) {
                 return;
         }
-        free(vm->mem);
+        free(vm->_mem);
         free(vm);
 }
 
@@ -61,17 +61,13 @@ int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size) {
                 return 1;
         }
 
-        memcpy(vm->mem + offset, buffer, size);
+        memcpy(vm->_mem + offset, buffer, size);
 
         return 0;
 }
 
 Instruction vm_fetch(VM *vm) {
-        Instruction inst =
-            (Instruction)(vm->mem[(vm_pc_read(vm)) % vm->mem_size] |
-                          (vm->mem[(vm_pc_read(vm) + 1) % vm->mem_size] << 8) |
-                          (vm->mem[(vm_pc_read(vm) + 2) % vm->mem_size] << 16) |
-                          (vm->mem[(vm_pc_read(vm) + 3) % vm->mem_size] << 24));
+        Instruction inst = (Instruction)(*vm_mem_ptr_word(vm, vm_pc_read(vm)));
 
         return inst;
 }

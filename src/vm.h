@@ -2,17 +2,31 @@
 #define VM_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "instruction.h"
 
 #define VM_REG_NUM 32
 
 typedef struct {
+        /**
+         * @brief 应当使用 vm_pc_read 和 vm_pc_write 来访问 _pc
+         *
+         */
         uint32_t _pc;
         uint32_t pc_next;
+        /**
+         * @brief 应当使用 vm_reg_read 和 vm_reg_write 来访问 _regs
+         *
+         */
         uint32_t _regs[VM_REG_NUM];
         uint32_t mem_size;
-        uint8_t *mem;
+        /**
+         * @brief 应当使用 vm_mem_ptr_byte/half/word 来访问 _mem
+         *
+         */
+        uint8_t *_mem;
 } VM;
 
 /**
@@ -46,20 +60,24 @@ void vm_debug(VM *vm);
  * @param vm 虚拟机实例指针
  * @return PC寄存器的值
  */
-static inline uint32_t vm_pc_read(VM *vm) {
-        return vm->_pc;
-}
+static inline uint32_t vm_pc_read(VM *vm) { return vm->_pc; }
 
 /**
  * @brief 将值写入PC寄存器
  *
  * @param vm 虚拟机实例指针
  * @param value 写入PC寄存器的值
- * 
+ *
  * @note 自动根据虚拟机实例内存大小环绕
  */
 static inline void vm_pc_write(VM *vm, uint32_t value) {
-        vm->_pc = value % vm->mem_size;
+        if (value >= vm->mem_size) {
+                fprintf(stderr,
+                        "PC value 0x%08X out of memory bounds (mem_size: %d)\n",
+                        value, vm->mem_size);
+                exit(1);
+        }
+        vm->_pc = value;
 }
 
 /**
@@ -90,6 +108,65 @@ static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
                 return;
         }
         vm->_regs[reg_num] = value;
+}
+
+/**
+ * @brief 从虚拟机内存中取一个字节指针
+ *
+ * @param vm 虚拟机实例指针
+ * @param addr 起始地址
+ * @return 起始地址处的字节指针
+ */
+static inline uint8_t *vm_mem_ptr_byte(VM *vm, uint32_t addr) {
+        if (addr >= vm->mem_size) {
+                fprintf(stderr,
+                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        addr, vm->mem_size);
+                exit(1);
+        }
+        return &vm->_mem[addr];
+}
+
+/**
+ * @brief 从虚拟机内存中取一个半字指针
+ *
+ * @param vm 虚拟机实例指针
+ * @param addr 起始地址
+ * @return 起始地址处的半字指针
+ */
+static inline uint16_t *vm_mem_ptr_half(VM *vm, uint32_t addr) {
+        if (addr & 1) {
+                fprintf(stderr, "Unaligned half access: 0x%08X\n", addr);
+                exit(1);
+        }
+        if (addr + 1 >= vm->mem_size) {
+                fprintf(stderr,
+                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        addr, vm->mem_size);
+                exit(1);
+        }
+        return (uint16_t *)&vm->_mem[addr];
+}
+
+/**
+ * @brief 从虚拟机内存中取一个字指针
+ *
+ * @param vm 虚拟机实例指针
+ * @param addr 起始地址
+ * @return 起始地址处的字指针
+ */
+static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
+        if (addr & 3) {
+                fprintf(stderr, "Unaligned word access: 0x%08X\n", addr);
+                exit(1);
+        }
+        if (addr + 3 >= vm->mem_size) {
+                fprintf(stderr,
+                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        addr, vm->mem_size);
+                exit(1);
+        }
+        return (uint32_t *)&vm->_mem[addr];
 }
 
 /**
