@@ -2,6 +2,7 @@ set(VM_SOURCES
     ../src/exec.c
     ../src/vm.c
     ../src/instruction.c
+    ../src/ecall.c
 )
 
 file(GLOB TEST_SOURCES "test_*.c")

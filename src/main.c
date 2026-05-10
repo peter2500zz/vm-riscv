@@ -75,35 +75,20 @@ int main(int argc, char *argv[]) {
         }
 
         // 读取缓冲区到虚拟机内存
-        int load_failed = vm_load(vm, 0, buffer, buffer_size) != 0;
+        int load_failed = vm_load_elf(vm, buffer, buffer_size) != 0;
         free(buffer);
         if (load_failed) {
                 fprintf(stderr, "Failed to load file data into VM memory\n");
                 result = 1;
                 goto out_free_vm;
         }
+        vm_reg_write(vm, 2, (vm->mem_size - 16) & ~(uint32_t)0xF);
 
-        printf("Doing something with the VM...\n");
+        printf("===== VM Started =====\n");
 
         // 主循环
         while (1) {
-                int input = getchar();
-                while (getchar() != '\n')
-                        ;
-
-                switch (input) {
-                case 'q':
-                        goto out_free_vm;
-                case 'd':
-                        vm_debug(vm);
-                        break;
-                case 's':
-                        vm_step(vm);
-                        break;
-                default:
-                        printf("Unknown command: %c\n", input);
-                        break;
-                }
+                vm_step(vm);
         }
 
         // 清理

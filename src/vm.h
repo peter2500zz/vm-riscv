@@ -135,10 +135,10 @@ static inline uint8_t *vm_mem_ptr_byte(VM *vm, uint32_t addr) {
  * @return 起始地址处的半字指针
  */
 static inline uint16_t *vm_mem_ptr_half(VM *vm, uint32_t addr) {
-        if (addr & 1) {
-                fprintf(stderr, "Unaligned half access: 0x%08X\n", addr);
-                exit(1);
-        }
+        // if (addr & 1) {
+        //         fprintf(stderr, "Unaligned half access: 0x%08X\n", addr);
+        //         exit(1);
+        // }
         if (addr + 1 >= vm->mem_size) {
                 fprintf(stderr,
                         "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
@@ -156,10 +156,10 @@ static inline uint16_t *vm_mem_ptr_half(VM *vm, uint32_t addr) {
  * @return 起始地址处的字指针
  */
 static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
-        if (addr & 3) {
-                fprintf(stderr, "Unaligned word access: 0x%08X\n", addr);
-                exit(1);
-        }
+        // if (addr & 3) {
+        //         fprintf(stderr, "Unaligned word access: 0x%08X\n", addr);
+        //         exit(1);
+        // }
         if (addr + 3 >= vm->mem_size) {
                 fprintf(stderr,
                         "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
@@ -170,15 +170,19 @@ static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
 }
 
 /**
- * @brief 从文件加载数据到虚拟机内存
+ * @brief 将数据从缓冲区直接拷贝到虚拟机内存
  *
  * @param vm 虚拟机实例指针
- * @param filename 文件路径
+ * @param offset 虚拟机内存中的偏移地址
+ * @param buffer 数据缓冲区指针
+ * @param size 数据大小
  * @return: 成功返回0，失败返回1
  *
- * @warning 文件大小如果超过虚拟机内存大小，将失败
+ * @warning 数据大小如果超过虚拟机内存大小，将失败
  */
 int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size);
+
+int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size);
 
 /**
  * @brief 从虚拟机内存中获取PC指向的指令

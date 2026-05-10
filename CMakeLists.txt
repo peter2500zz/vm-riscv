@@ -10,6 +10,7 @@ add_executable(vm
         src/vm.c
         src/instruction.c
         src/exec.c
+        src/ecall.c
 )
 
 target_compile_options(vm PRIVATE
