@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         }
         vm_reg_write(vm, 2, (vm->mem_size - 16) & ~(uint32_t)0xF);
 
-        printf("===== VM Started =====\n");
+        printf("==== VM Started ====\n");
 
         // 主循环
         while (1) {

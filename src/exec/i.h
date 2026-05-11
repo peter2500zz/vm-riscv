@@ -1,8 +1,8 @@
 #ifndef EXEC_H
 #define EXEC_H
 
-#include "instruction.h"
-#include "vm.h"
+#include "../instruction.h"
+#include "../vm.h"
 
 /**
  * @brief

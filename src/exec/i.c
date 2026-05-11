@@ -1,8 +1,6 @@
 #include <stdint.h>
 
-#include "exec.h"
-#include "instruction.h"
-#include "vm.h"
+#include "i.h"
 
 void exec_lui(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);

@@ -1,5 +1,5 @@
 set(VM_SOURCES
-    ../src/exec.c
+    ../src/exec/i.c
     ../src/vm.c
     ../src/instruction.c
     ../src/ecall.c
