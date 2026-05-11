@@ -120,7 +120,7 @@ static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
 static inline uint8_t *vm_mem_ptr_byte(VM *vm, uint32_t addr) {
         if (addr >= vm->mem_size) {
                 fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
                         addr, vm->mem_size);
                 exit(1);
         }
@@ -141,7 +141,7 @@ static inline uint16_t *vm_mem_ptr_half(VM *vm, uint32_t addr) {
         // }
         if (addr + 1 >= vm->mem_size) {
                 fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
                         addr, vm->mem_size);
                 exit(1);
         }
@@ -162,7 +162,7 @@ static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
         // }
         if (addr + 3 >= vm->mem_size) {
                 fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: %d)\n",
+                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
                         addr, vm->mem_size);
                 exit(1);
         }

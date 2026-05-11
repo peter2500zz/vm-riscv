@@ -10,6 +10,7 @@ add_executable(vm
         src/vm.c
         src/instruction.c
         src/exec/i.c
+        src/exec/m.c
         src/ecall.c
 )
 

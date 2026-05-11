@@ -1,7 +1,6 @@
-#ifndef EXEC_H
-#define EXEC_H
+#ifndef EXEC_I_H
+#define EXEC_I_H
 
-#include "../instruction.h"
 #include "../vm.h"
 
 /**
@@ -390,4 +389,4 @@ void exec_or(VM *vm, Instruction inst);
  */
 void exec_and(VM *vm, Instruction inst);
 
-#endif // EXEC_H
+#endif // EXEC_I_H

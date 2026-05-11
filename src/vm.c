@@ -6,6 +6,7 @@
 
 #include "ecall.h"
 #include "exec/i.h"
+#include "exec/m.h"
 #include "instruction.h"
 #include "vm.h"
 
@@ -349,11 +350,16 @@ int vm_exec(VM *vm, Instruction inst) {
         // R 10
         case 0x33: // 0b0110011
                 switch (funct3) {
-                case 0x0: // 0b000
+                case 0x00: // 0b000
                         switch (funct7) {
                         // ADD
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_add(vm, inst);
+
+                                goto done;
+                        // MUL
+                        case 0x01: // 0b0000001
+                                exec_mul(vm, inst);
 
                                 goto done;
                         // SUB
@@ -364,51 +370,76 @@ int vm_exec(VM *vm, Instruction inst) {
                         }
 
                         break;
-                case 0x1: // 0b001
+                case 0x01: // 0b001
                         switch (funct7) {
                         // SLL
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_sll(vm, inst);
 
                                 goto done;
+                        // MULH
+                        case 0x01: // 0b0000001
+                                exec_mulh(vm, inst);
+
+                                goto done;
                         }
 
                         break;
-                case 0x2: // 0b010
+                case 0x02: // 0b010
                         switch (funct7) {
                         // SLT
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_slt(vm, inst);
 
                                 goto done;
+                        // MULHSU
+                        case 0x01: // 0b0000001
+                                exec_mulhsu(vm, inst);
+
+                                goto done;
                         }
 
                         break;
-                case 0x3: // 0b011
+                case 0x03: // 0b011
                         switch (funct7) {
                         // SLTU
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_sltu(vm, inst);
 
                                 goto done;
-                        }
-
-                        break;
-                case 0x4: // 0b100
-                        switch (funct7) {
-                        // XOR
-                        case 0x0: // 0b0000000
-                                exec_xor(vm, inst);
+                        // MULHU
+                        case 0x01: // 0b0000001
+                                exec_mulhu(vm, inst);
 
                                 goto done;
                         }
 
                         break;
-                case 0x5: // 0b101
+                case 0x04: // 0b100
+                        switch (funct7) {
+                        // XOR
+                        case 0x00: // 0b0000000
+                                exec_xor(vm, inst);
+
+                                goto done;
+                        // DIV
+                        case 0x01: // 0b0000001
+                                exec_div(vm, inst);
+
+                                goto done;
+                        }
+
+                        break;
+                case 0x05: // 0b101
                         switch (funct7) {
                         // SRL
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_srl(vm, inst);
+
+                                goto done;
+                        // DIVU
+                        case 0x01: // 0b0000001
+                                exec_divu(vm, inst);
 
                                 goto done;
                         // SRA
@@ -419,21 +450,31 @@ int vm_exec(VM *vm, Instruction inst) {
                         }
 
                         break;
-                case 0x6: // 0b110
+                case 0x06: // 0b110
                         switch (funct7) {
                         // OR
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_or(vm, inst);
+
+                                goto done;
+                        // REM
+                        case 0x01: // 0b0000001
+                                exec_rem(vm, inst);
 
                                 goto done;
                         }
 
                         break;
-                case 0x7: // 0b111
+                case 0x07: // 0b111
                         switch (funct7) {
                         // AND
-                        case 0x0: // 0b0000000
+                        case 0x00: // 0b0000000
                                 exec_and(vm, inst);
+
+                                goto done;
+                        // REMU
+                        case 0x01: // 0b0000001
+                                exec_remu(vm, inst);
 
                                 goto done;
                         }
