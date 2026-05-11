@@ -1,7 +1,7 @@
 #ifndef ECALL_H
 #define ECALL_H
 
-#include "../../vm.h"
+#include "../../vm/spec/vm.h"
 
 void handle_ecall(VM *vm);
 

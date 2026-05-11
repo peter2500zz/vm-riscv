@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../dispatcher/root.h"
 #include "vm.h"
-#include "instruction.h"
-#include "dispatcher/root.h"
 
 const char *reg_name[] = {"zero", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
                           "s0",   "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
@@ -65,8 +64,6 @@ int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size) {
 
         return 0;
 }
-
-
 
 typedef struct {
         uint8_t e_ident[16];
@@ -157,6 +154,12 @@ int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size) {
         // 设置 PC 为入口地址
         vm_pc_write(vm, eh->e_entry);
         return 0;
+}
+
+Instruction vm_fetch(VM *vm) {
+        Instruction inst = (Instruction)(*vm_mem_ptr_word(vm, vm_pc_read(vm)));
+
+        return inst;
 }
 
 void vm_step(VM *vm) {

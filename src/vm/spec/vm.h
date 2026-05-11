@@ -1,14 +1,19 @@
-#ifndef VM_H
-#define VM_H
+#ifndef VM_SPEC_H
+#define VM_SPEC_H
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "inst.h"
 
 #define VM_REG_NUM 32
 #define VM_CSR_NUM 4096
 
+/**
+ * @brief 虚拟机实例结构体
+ *
+ */
 typedef struct {
         /**
          * @brief 应当使用 vm_pc_read 和 vm_pc_write 来访问 _pc
@@ -27,11 +32,15 @@ typedef struct {
          *
          */
         uint8_t *_mem;
+
+        // 下为特权模式
+
         /**
          * @brief CSR 寄存器
-         * 
+         *
          */
         uint32_t _csr[VM_CSR_NUM];
+        char trap_pending;
 } VM;
 
 /**
@@ -124,9 +133,10 @@ static inline void vm_reg_write(VM *vm, uint32_t reg_num, uint32_t value) {
  */
 static inline uint8_t *vm_mem_ptr_byte(VM *vm, uint32_t addr) {
         if (addr >= vm->mem_size) {
-                fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                        addr, vm->mem_size);
+                fprintf(
+                    stderr,
+                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
+                    addr, vm->mem_size);
                 exit(1);
         }
         return &vm->_mem[addr];
@@ -145,9 +155,10 @@ static inline uint16_t *vm_mem_ptr_half(VM *vm, uint32_t addr) {
         //         exit(1);
         // }
         if (addr + 1 >= vm->mem_size) {
-                fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                        addr, vm->mem_size);
+                fprintf(
+                    stderr,
+                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
+                    addr, vm->mem_size);
                 exit(1);
         }
         return (uint16_t *)&vm->_mem[addr];
@@ -166,9 +177,10 @@ static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
         //         exit(1);
         // }
         if (addr + 3 >= vm->mem_size) {
-                fprintf(stderr,
-                        "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                        addr, vm->mem_size);
+                fprintf(
+                    stderr,
+                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
+                    addr, vm->mem_size);
                 exit(1);
         }
         return (uint32_t *)&vm->_mem[addr];
@@ -190,10 +202,18 @@ int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size);
 int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size);
 
 /**
+ * @brief 从虚拟机内存中获取PC指向的指令
+ *
+ * @param vm 虚拟机实例指针
+ * @return 从内存中获取的指令
+ */
+Instruction vm_fetch(VM *vm);
+
+/**
  * @brief 执行pc指向的指令
  *
  * @param vm 虚拟机实例指针
  */
 void vm_step(VM *vm);
 
-#endif // VM_H
+#endif // VM_SPEC_H

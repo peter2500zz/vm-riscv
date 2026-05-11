@@ -1,8 +1,7 @@
 #ifndef M_EXEC_H
 #define M_EXEC_H
 
-#include "../../vm.h"
-#include "../../instruction.h"
+#include "../../vm/spec/vm.h"
 
 /**
  * @brief

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "vm.h"
+#include "vm/spec/vm.h"
 
 /**
  * @brief 将给定路径的文件读取入缓冲区

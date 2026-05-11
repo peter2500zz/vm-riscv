@@ -5,13 +5,13 @@ void handle_ecall(VM *vm) {
         void *arg0 = (void *)(intptr_t)vm_reg_read(vm, 10); // a0
         void *arg1 = (void *)(intptr_t)vm_reg_read(vm, 11); // a1
         void *arg2 = (void *)(intptr_t)vm_reg_read(vm, 12); // a2
-        void *arg3 = (void *)(intptr_t)vm_reg_read(vm, 13); // a3
-        void *arg4 = (void *)(intptr_t)vm_reg_read(vm, 14); // a4
-        void *arg5 = (void *)(intptr_t)vm_reg_read(vm, 15); // a5
+        // void *arg3 = (void *)(intptr_t)vm_reg_read(vm, 13); // a3
+        // void *arg4 = (void *)(intptr_t)vm_reg_read(vm, 14); // a4
+        // void *arg5 = (void *)(intptr_t)vm_reg_read(vm, 15); // a5
 
         switch (syscall_num) {
         // write(1, buf, len)
-        case 64:
+        case 64: {
                 uint32_t buffer_addr = (uint32_t)(intptr_t)arg1;
                 uint32_t buffer_len = (uint32_t)(intptr_t)arg2;
 
@@ -21,6 +21,7 @@ void handle_ecall(VM *vm) {
                 }
 
                 break;
+        }
 
         case 93: // exit
                 printf("Program exited with code %d\n", (int)(intptr_t)arg0);

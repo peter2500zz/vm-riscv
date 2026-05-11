@@ -7,8 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(vm
         src/main.c
-        src/vm.c
-        src/instruction.c
+        src/vm/spec/vm.c
+        src/vm/privileged/vm.c
         src/dispatcher/root.c
         src/modules/i/exec.c
         src/modules/m/exec.c

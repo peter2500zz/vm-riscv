@@ -3,14 +3,10 @@
 #include "../modules/i/exec.h"
 // m 模块指令
 #include "../modules/m/exec.h"
+// zicsr 模块指令
+#include "../modules/zicsr/exec.h"
 // ecall 指令
 #include "../modules/ecall/exec.h"
-
-Instruction vm_fetch(VM *vm) {
-        Instruction inst = (Instruction)(*vm_mem_ptr_word(vm, vm_pc_read(vm)));
-
-        return inst;
-}
 
 int vm_dispatch(VM *vm, Instruction inst) {
         vm->pc_next = vm_pc_read(vm) + 4;
@@ -392,22 +388,34 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         break;
                 // CSRRW
                 case 0x01: // 0b001
-                        break;
+                        exec_csrrw(vm, inst);
+
+                        goto done;
                 // CSRRS
                 case 0x02: // 0b010
-                        break;
+                        exec_csrrs(vm, inst);
+
+                        goto done;
                 // CSRRC
                 case 0x03: // 0b011
-                        break;
+                        exec_csrrc(vm, inst);
+
+                        goto done;
                 // CSRRWI
                 case 0x05: // 0b101
-                        break;
+                        exec_csrrwi(vm, inst);
+
+                        goto done;
                 // CSRRSI
                 case 0x06: // 0b110
-                        break;
+                        exec_csrrsi(vm, inst);
+
+                        goto done;
                 // CSRRCI
                 case 0x07: // 0b111
-                        break;
+                        exec_csrrci(vm, inst);
+
+                        goto done;
                 }
 
                 break;
