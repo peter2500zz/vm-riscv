@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "instruction.h"
 
 #define VM_REG_NUM 32
+#define VM_CSR_NUM 4096
 
 typedef struct {
         /**
@@ -27,6 +27,11 @@ typedef struct {
          *
          */
         uint8_t *_mem;
+        /**
+         * @brief CSR 寄存器
+         * 
+         */
+        uint32_t _csr[VM_CSR_NUM];
 } VM;
 
 /**
@@ -183,25 +188,6 @@ static inline uint32_t *vm_mem_ptr_word(VM *vm, uint32_t addr) {
 int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size);
 
 int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size);
-
-/**
- * @brief 从虚拟机内存中获取PC指向的指令
- *
- * @param vm 虚拟机实例指针
- * @return 从内存中获取的指令
- */
-Instruction vm_fetch(VM *vm);
-
-/**
- * @brief 执行一条指令，并改变pc
- *
- * @param vm 虚拟机实例指针
- * @param inst 指令
- * @return 是否执行成功
- *
- * @note 执行失败pc不变
- */
-int vm_exec(VM *vm, Instruction inst);
 
 /**
  * @brief 执行pc指向的指令

@@ -9,9 +9,11 @@ add_executable(vm
         src/main.c
         src/vm.c
         src/instruction.c
-        src/exec/i.c
-        src/exec/m.c
-        src/ecall.c
+        src/dispatcher/root.c
+        src/modules/i/exec.c
+        src/modules/m/exec.c
+        src/modules/ecall/exec.c
+        src/modules/zicsr/exec.c
 )
 
 target_compile_options(vm PRIVATE

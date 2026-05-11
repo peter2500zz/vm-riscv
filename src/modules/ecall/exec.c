@@ -1,5 +1,4 @@
-
-#include "vm.h"
+#include "exec.h"
 
 void handle_ecall(VM *vm) {
         int32_t syscall_num = (int32_t)vm_reg_read(vm, 17); // a7

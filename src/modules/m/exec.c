@@ -1,6 +1,4 @@
-
-#include "../vm.h"
-#include <stdint.h>
+#include "exec.h"
 
 void exec_mul(VM *vm, Instruction inst) {
         uint32_t rd = inst_rd(inst);

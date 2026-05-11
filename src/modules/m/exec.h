@@ -1,7 +1,8 @@
-#ifndef EXEC_M_H
-#define EXEC_M_H
+#ifndef M_EXEC_H
+#define M_EXEC_H
 
-#include "../vm.h"
+#include "../../vm.h"
+#include "../../instruction.h"
 
 /**
  * @brief
@@ -77,4 +78,4 @@ void exec_rem(VM *vm, Instruction inst);
  */
 void exec_remu(VM *vm, Instruction inst);
 
-#endif // EXEC_M_H
+#endif // M_EXEC_H

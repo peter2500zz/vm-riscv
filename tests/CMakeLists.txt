@@ -1,9 +1,11 @@
 set(VM_SOURCES
-    ../src/exec/i.c
-    ../src/exec/m.c
-    ../src/vm.c
-    ../src/instruction.c
-    ../src/ecall.c
+        ../src/vm.c
+        ../src/instruction.c
+        ../src/dispatcher/root.c
+        ../src/modules/i/exec.c
+        ../src/modules/m/exec.c
+        ../src/modules/ecall/exec.c
+        ../src/modules/zicsr/exec.c
 )
 
 file(GLOB TEST_SOURCES "test_*.c")
