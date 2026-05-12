@@ -15,7 +15,9 @@ Machine *machine_new(uint32_t hart_num, uint32_t mem_size);
 
 void machine_free(Machine *machine);
 
-void machine_init(Machine *machine, uint8_t *buffer, uint32_t size);
+void machine_load_raw(Machine *machine, uint8_t *buffer, uint32_t size);
+
+int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size);
 
 void machine_go(Machine *machine);
 

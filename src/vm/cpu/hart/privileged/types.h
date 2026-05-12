@@ -20,7 +20,7 @@ typedef union {
 } CSR;
 
 static inline CSR inst_csr(Instruction inst) {
-        return (CSR){.addr = (uint32_t)inst_imm_i(inst)};
+        return (CSR){.addr = (uint32_t)BITS(inst, 31, 20)};
 }
 
 #endif // PRIVILEGED_INST_H

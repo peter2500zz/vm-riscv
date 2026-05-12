@@ -26,8 +26,8 @@ int hart_init(Hart *hart, Memory *mem) {
 
 void hart_debug(Hart *hart) {
         printf("===== Hart stats =====\n");
-        printf("Memsize: %d\n", hart->mem->size);
-        printf("pc: %d\n", hart_pc_read(hart));
+        printf("Memsize: %u\n", hart->mem->size);
+        printf("pc: 0x%08X\n", hart_pc_read(hart));
         for (uint32_t i = 0; i < HART_REG_NUM; i++) {
                 printf("%s: 0x%08X\n", reg_name[i], hart_reg_read(hart, i));
         }

@@ -1,54 +1,79 @@
 #include "handler.h"
+#include <fcntl.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-uint8_t lsr = 0;
-uint8_t rbr = 0;
+typedef struct {
+        int fd;
+        uint8_t cache;
+        char pending;
+} FakeUART;
 
-uint32_t dindex = 0;
-uint8_t *data = NULL;
+static FakeUART *uart = NULL;
+
+static void uart_init(void) {
+        if (uart != NULL)
+                return;
+        uart = malloc(sizeof(FakeUART));
+        if (uart == NULL) {
+                fprintf(stderr, "Failed to allocate memory for UART\n");
+                exit(1);
+        }
+        uart->pending = 0;
+        uart->cache = 0;
+        uart->fd = open("/tmp/ttyV1", O_RDWR | O_NONBLOCK);
+        if (uart->fd < 0) {
+                fprintf(stderr, "Failed to open /tmp/ttyV1\n");
+                free(uart);
+                uart = NULL;
+                exit(1);
+        }
+        printf("successfully opened /tmp/ttyV1 for UART emulation\n");
+}
 
 void handle_uart(Hart *hart, uint32_t addr, void *target, uint32_t size,
                  MemAccessType type) {
-        if (data == NULL) {
-                printf("Init fake data\n");
-
-                FILE *fp = fopen("bin", "rb");
-                if (fp == NULL) {
-                        exit(1);
-                }
-
-                fseek(fp, 0, SEEK_END);
-                long file_size = ftell(fp);
-                if (file_size < 0 || file_size > (long)INT32_MAX) {
-                        exit(1);
-                }
-                fseek(fp, 0, SEEK_SET);
-
-                uint8_t *buffer = malloc((uint32_t)file_size);
-                if (buffer == NULL) {
-                        exit(1);
-                }
-
-                // 将文件大小写入data，然后追加二进制数据
-                *(uint32_t *)buffer = (uint32_t)file_size;
-                size_t bytes_read =
-                    fread(buffer + sizeof(uint32_t), 1, (size_t)file_size, fp);
-                if ((uint32_t)file_size != (uint32_t)bytes_read) {
-                        free(buffer);
-                        exit(1);
-                }
-                data = buffer;
-                printf("Success\n");
-        }
+        uart_init();
 
         switch (addr - UART_ADDR) {
-        case 0x05:                                  // LSR
-                *((uint8_t *)target) = 0x01; // DR位为1，表示有数据可读
+        case 0x05: { // LSR
+                if (!uart->pending) {
+                        uint8_t ch;
+                        ssize_t n = read(uart->fd, &ch, 1);
+                        if (n == 1) {
+                                uart->cache = ch;
+                                uart->pending = 1;
+                        }
+                }
+                *(uint8_t *)target = uart->pending ? 0x61 : 0x60;
                 break;
-        case 0x00:                                  // RBR
-                *((uint8_t *)target) = data[dindex];
-                dindex++;
+        }
+        case 0x00: { // RBR/THR
+                switch (type) {
+                case MEM_READ: {
+                        if (uart->pending) {
+                                *(uint8_t *)target = uart->cache;
+                                uart->pending = 0;
+                                uint8_t ch;
+                                ssize_t n = read(uart->fd, &ch, 1);
+                                if (n == 1) {
+                                        uart->cache = ch;
+                                        uart->pending = 1;
+                                }
+                        } else {
+                                *(uint8_t *)target = 0x00;
+                        }
+                        break;
+                }
+                case MEM_WRITE: {
+                        write(uart->fd, target, 1);
+                        break;
+                }
+                }
                 break;
+        }
         }
 }

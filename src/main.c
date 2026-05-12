@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 初始化虚拟机
-        Machine *machine = machine_new(4, 1 << 22); // 4 harts, 4MiB memory
+        Machine *machine = machine_new(4, 1 << 27); // 4 harts, 128MiB memory
         if (machine == NULL) {
                 fprintf(stderr, "Failed to create machine\n");
                 result = 1;
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 硬件线程0加载程序
-        machine_init(machine, buffer, buffer_size);
+        machine_load_elf(machine, buffer, buffer_size);
         free(buffer);
 
         // 运行虚拟机
