@@ -6,6 +6,9 @@ set(Hart_SOURCES
         ../src/vm/cpu/hart/privileged.c
         # 内存
         ../src/vm/memory/access.c
+        # 设备
+        ../src/vm/devices/mmio.c
+        ../src/vm/devices/uart/handler.c
         # 调度器
         ../src/vm/cpu/dispatcher/root.c
         # 扩展

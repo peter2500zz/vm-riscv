@@ -1,4 +1,5 @@
 #include "access.h"
+#include "../devices/mmio.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -35,7 +36,7 @@ void memory_free(Memory *mem) {
 }
 
 void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                  MemAccessType type) {
+                   MemAccessType type) {
         switch (size) {
         case sizeof(uint8_t):
                 break;
@@ -55,8 +56,8 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 break;
         }
         if (addr < RAM_ADDR) {
-                // TODO
-                fprintf(stderr, "Accessing I/O at 0x%08x\n", addr);
+                handle_mmio(hart, addr, target, size, type);
+
                 return;
         }
         if (addr >= RAM_ADDR + hart->mem->size) {
