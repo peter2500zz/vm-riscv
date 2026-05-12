@@ -17,26 +17,26 @@
                 printf("PASS: %s:%d\n", __FILE__, __LINE__);                   \
         }
 
-#define SETUP_VM(mem_size)                                                     \
-        VM *vm = vm_new(mem_size);                                             \
-        if (vm == NULL) {                                                      \
-                printf("FAIL: vm_new returned NULL\n");                        \
+#define SETUP_HART(mem_size)                                                     \
+        Hart *hart = hart_new(mem_size);                                             \
+        if (hart == NULL) {                                                      \
+                printf("FAIL: hart_new returned NULL\n");                        \
                 return 1;                                                      \
         }
 
-#define FILL_VM(...)                                                           \
+#define FILL_Hart(...)                                                           \
         do {                                                                   \
                 uint32_t _buf[] = {__VA_ARGS__};                               \
-                if (vm_load(vm, 0x0, (uint8_t *)_buf, sizeof(_buf)) != 0) {    \
-                        printf("FAIL: vm_load failed\n");                      \
+                if (hart_load(hart, 0x0, (uint8_t *)_buf, sizeof(_buf)) != 0) {    \
+                        printf("FAIL: hart_load failed\n");                      \
                         return 1;                                              \
                 }                                                              \
         } while (0)
 
 #define EXECUTE(instruction)                                                   \
         do {                                                                   \
-                if (vm_dispatch(vm, instruction) != 0) {                       \
-                        printf("FAIL: vm_dispatch failed\n");                  \
+                if (hart_dispatch(hart, instruction) != 0) {                       \
+                        printf("FAIL: hart_dispatch failed\n");                  \
                         return 1;                                              \
                 }                                                              \
         } while (0)

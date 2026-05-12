@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "vm/spec/vm.h"
+#include "vm/hart/unprivileged.h"
 
 /**
  * @brief 将给定路径的文件读取入缓冲区
@@ -58,9 +58,9 @@ int main(int argc, char *argv[]) {
         }
 
         // 初始化虚拟机
-        VM *vm = vm_new(20); // 1MiB memory
-        if (vm == NULL) {
-                fprintf(stderr, "Failed to create VM\n");
+        Hart *hart = hart_new(20); // 1MiB memory
+        if (hart == NULL) {
+                fprintf(stderr, "Failed to create Hart\n");
                 result = 1;
                 goto out;
         }
@@ -71,30 +71,30 @@ int main(int argc, char *argv[]) {
         if (buffer == NULL) {
                 fprintf(stderr, "Failed to load file: %s\n", argv[1]);
                 result = 1;
-                goto out_free_vm;
+                goto out_free_hart;
         }
 
         // 读取缓冲区到虚拟机内存
-        int load_failed = vm_load_elf(vm, buffer, buffer_size) != 0;
+        int load_failed = hart_load_elf(hart, buffer, buffer_size) != 0;
         free(buffer);
         if (load_failed) {
-                fprintf(stderr, "Failed to load file data into VM memory\n");
+                fprintf(stderr, "Failed to load file data into Hart memory\n");
                 result = 1;
-                goto out_free_vm;
+                goto out_free_hart;
         }
-        vm_reg_write(vm, 2, (vm->mem_size - 16) & ~(uint32_t)0xF);
+        hart_reg_write(hart, 2, (hart->mem_size - 16) & ~(uint32_t)0xF);
 
-        printf("==== VM Started ====\n");
+        printf("==== Hart Started ====\n");
 
         // 主循环
         while (1) {
-                vm_step(vm);
+                hart_step(hart);
         }
 
         // 清理
-out_free_vm:
-        vm_free(vm);
-        vm = NULL;
+out_free_hart:
+        hart_free(hart);
+        hart = NULL;
 out:
         return result;
 }

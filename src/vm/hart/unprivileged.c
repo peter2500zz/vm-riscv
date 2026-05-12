@@ -5,62 +5,62 @@
 #include <string.h>
 
 #include "../../dispatcher/root.h"
-#include "vm.h"
+#include "unprivileged.h"
 
 const char *reg_name[] = {"zero", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
                           "s0",   "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
                           "a6",   "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
                           "s8",   "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
-VM *vm_new(int n) {
+Hart *hart_new(int n) {
         // 越界
         if (n < 0 || n > 31) {
                 goto out;
         }
         uint32_t size = (uint32_t)1 << n; // 2^n
 
-        VM *vm = calloc(1, sizeof(VM));
-        if (vm == NULL) {
+        Hart *hart = calloc(1, sizeof(Hart));
+        if (hart == NULL) {
                 goto out;
         }
-        vm->mem_size = size;
-        vm->_mem = calloc(1, size);
-        if (vm->_mem == NULL) {
-                goto out_free_vm;
+        hart->mem_size = size;
+        hart->_mem = calloc(1, size);
+        if (hart->_mem == NULL) {
+                goto out_free_hart;
         }
 
-        return vm;
+        return hart;
 
-out_free_vm:
-        free(vm);
+out_free_hart:
+        free(hart);
 out:
         return NULL;
 }
 
-void vm_free(VM *vm) {
-        if (vm == NULL) {
+void hart_free(Hart *hart) {
+        if (hart == NULL) {
                 return;
         }
-        free(vm->_mem);
-        free(vm);
+        free(hart->_mem);
+        free(hart);
 }
 
-void vm_debug(VM *vm) {
-        printf("===== VM stats =====\n");
-        printf("Memsize: %d\n", vm->mem_size);
-        printf("pc: %d\n", vm_pc_read(vm));
-        for (uint32_t i = 0; i < VM_REG_NUM; i++) {
-                printf("%s: 0x%08X\n", reg_name[i], vm_reg_read(vm, i));
+void hart_debug(Hart *hart) {
+        printf("===== Hart stats =====\n");
+        printf("Memsize: %d\n", hart->mem_size);
+        printf("pc: %d\n", hart_pc_read(hart));
+        for (uint32_t i = 0; i < HART_REG_NUM; i++) {
+                printf("%s: 0x%08X\n", reg_name[i], hart_reg_read(hart, i));
         }
         printf("===== End =====\n");
 }
 
-int vm_load(VM *vm, uint32_t offset, uint8_t *buffer, uint32_t size) {
-        if (offset >= vm->mem_size || vm->mem_size - offset < size) {
+int hart_load(Hart *hart, uint32_t offset, uint8_t *buffer, uint32_t size) {
+        if (offset >= hart->mem_size || hart->mem_size - offset < size) {
                 return 1;
         }
 
-        memcpy(vm->_mem + offset, buffer, size);
+        memcpy(hart->_mem + offset, buffer, size);
 
         return 0;
 }
@@ -78,7 +78,7 @@ typedef struct {
         uint32_t p_filesz, p_memsz, p_flags, p_align;
 } Elf32_Phdr;
 
-int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size) {
+int hart_load_elf(Hart *hart, uint8_t *buffer, uint32_t size) {
         if (size < sizeof(Elf32_Ehdr)) {
                 fprintf(stderr, "Buffer too small for ELF header\n");
                 return 1;
@@ -130,7 +130,7 @@ int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size) {
 
                 // 复制文件内容到虚拟地址
                 if (ph->p_filesz > 0) {
-                        if (vm_load(vm, ph->p_vaddr, buffer + ph->p_offset,
+                        if (hart_load(hart, ph->p_vaddr, buffer + ph->p_offset,
                                     ph->p_filesz) != 0) {
                                 fprintf(stderr, "Failed to load segment %d\n",
                                         i);
@@ -142,33 +142,33 @@ int vm_load_elf(VM *vm, uint8_t *buffer, uint32_t size) {
                 if (ph->p_memsz > ph->p_filesz) {
                         uint32_t bss_addr = ph->p_vaddr + ph->p_filesz;
                         uint32_t bss_size = ph->p_memsz - ph->p_filesz;
-                        if (bss_addr + bss_size > vm->mem_size) {
+                        if (bss_addr + bss_size > hart->mem_size) {
                                 fprintf(stderr,
-                                        "BSS segment %d out of VM memory\n", i);
+                                        "BSS segment %d out of Hart memory\n", i);
                                 return 1;
                         }
-                        memset(vm->_mem + bss_addr, 0, bss_size);
+                        memset(hart->_mem + bss_addr, 0, bss_size);
                 }
         }
 
         // 设置 PC 为入口地址
-        vm_pc_write(vm, eh->e_entry);
+        hart_pc_write(hart, eh->e_entry);
         return 0;
 }
 
-Instruction vm_fetch(VM *vm) {
-        Instruction inst = (Instruction)(*vm_mem_ptr_word(vm, vm_pc_read(vm)));
+Instruction hart_fetch(Hart *hart) {
+        Instruction inst = (Instruction)(*hart_mem_ptr_word(hart, hart_pc_read(hart)));
 
         return inst;
 }
 
-void vm_step(VM *vm) {
-        Instruction inst = vm_fetch(vm);
+void hart_step(Hart *hart) {
+        Instruction inst = hart_fetch(hart);
         // printf("opcode: 0x%08X\n", inst_opcode(inst));
 
-        if (vm_dispatch(vm, inst) != 0) {
+        if (hart_dispatch(hart, inst) != 0) {
                 fprintf(stderr, "==== Unknown instruction ====\n");
-                fprintf(stderr, "At 0x%08X\n", vm_pc_read(vm));
+                fprintf(stderr, "At 0x%08X\n", hart_pc_read(hart));
                 fprintf(stderr, "Instruction: 0x%08X\n", inst);
                 fprintf(stderr, "\topcode: 0x%02X\n", inst_opcode(inst));
                 fprintf(stderr, "\tfunct3: 0x%02X\n", inst_funct3(inst));

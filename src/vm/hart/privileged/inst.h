@@ -1,9 +1,9 @@
-#ifndef ZICSR_INST_H
-#define ZICSR_INST_H
+#ifndef PRIVILEGED_INST_H
+#define PRIVILEGED_INST_H
 
 #include <stdint.h>
 
-#include "../spec/inst.h"
+#include "../unprivileged/inst.h"
 
 typedef union {
         uint32_t addr;
@@ -13,4 +13,4 @@ static inline CSR inst_csr(Instruction inst) {
         return (CSR){.addr = (uint32_t)inst_imm_i(inst)};
 }
 
-#endif // ZICSR_INST_H
+#endif // PRIVILEGED_INST_H

@@ -1,5 +1,5 @@
-#ifndef INSTRUCTION_H
-#define INSTRUCTION_H
+#ifndef UNPRIVILEGED_INST_H
+#define UNPRIVILEGED_INST_H
 
 #include <stdint.h>
 
@@ -121,4 +121,4 @@ static inline int32_t inst_imm_j(Instruction inst) {
                            21);
 }
 
-#endif // INSTRUCTION_H
+#endif // UNPRIVILEGED_INST_H

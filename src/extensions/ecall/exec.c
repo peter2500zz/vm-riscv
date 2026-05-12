@@ -1,13 +1,13 @@
 #include "exec.h"
 
-void handle_ecall(VM *vm) {
-        int32_t syscall_num = (int32_t)vm_reg_read(vm, 17); // a7
-        void *arg0 = (void *)(intptr_t)vm_reg_read(vm, 10); // a0
-        void *arg1 = (void *)(intptr_t)vm_reg_read(vm, 11); // a1
-        void *arg2 = (void *)(intptr_t)vm_reg_read(vm, 12); // a2
-        // void *arg3 = (void *)(intptr_t)vm_reg_read(vm, 13); // a3
-        // void *arg4 = (void *)(intptr_t)vm_reg_read(vm, 14); // a4
-        // void *arg5 = (void *)(intptr_t)vm_reg_read(vm, 15); // a5
+void handle_ecall(Hart *hart) {
+        int32_t syscall_num = (int32_t)hart_reg_read(hart, 17); // a7
+        void *arg0 = (void *)(intptr_t)hart_reg_read(hart, 10); // a0
+        void *arg1 = (void *)(intptr_t)hart_reg_read(hart, 11); // a1
+        void *arg2 = (void *)(intptr_t)hart_reg_read(hart, 12); // a2
+        // void *arg3 = (void *)(intptr_t)hart_reg_read(hart, 13); // a3
+        // void *arg4 = (void *)(intptr_t)hart_reg_read(hart, 14); // a4
+        // void *arg5 = (void *)(intptr_t)hart_reg_read(hart, 15); // a5
 
         switch (syscall_num) {
         // write(1, buf, len)
@@ -16,7 +16,7 @@ void handle_ecall(VM *vm) {
                 uint32_t buffer_len = (uint32_t)(intptr_t)arg2;
 
                 for (uint32_t i = 0; i < buffer_len; i++) {
-                        uint8_t byte = *vm_mem_ptr_byte(vm, buffer_addr + i);
+                        uint8_t byte = *hart_mem_ptr_byte(hart, buffer_addr + i);
                         putchar(byte);
                 }
 

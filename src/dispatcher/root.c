@@ -1,15 +1,15 @@
 #include "root.h"
 // i 模块指令
-#include "../modules/i/exec.h"
+#include "../extensions/i/exec.h"
 // m 模块指令
-#include "../modules/m/exec.h"
+#include "../extensions/m/exec.h"
 // zicsr 模块指令
-#include "../modules/zicsr/exec.h"
+#include "../extensions/zicsr/exec.h"
 // ecall 指令
-#include "../modules/ecall/exec.h"
+#include "../extensions/ecall/exec.h"
 
-int vm_dispatch(VM *vm, Instruction inst) {
-        vm->pc_next = vm_pc_read(vm) + 4;
+int hart_dispatch(Hart *hart, Instruction inst) {
+        hart->pc_next = hart_pc_read(hart) + 4;
 
         uint32_t opcode = inst_opcode(inst);
         uint32_t rd = inst_rd(inst);
@@ -21,22 +21,22 @@ int vm_dispatch(VM *vm, Instruction inst) {
         switch (opcode) {
         // U LUI
         case 0x37: // 0b0110111
-                exec_lui(vm, inst);
+                exec_lui(hart, inst);
 
                 goto done;
         // U AUIPC
         case 0x17: // 0b0010111
-                exec_auipc(vm, inst);
+                exec_auipc(hart, inst);
 
                 goto done;
         // J JAL
         case 0x6f: // 0b1101111
-                exec_jal(vm, inst);
+                exec_jal(hart, inst);
 
                 goto done;
         // I JALR
         case 0x67: // 0b1100111
-                exec_jalr(vm, inst);
+                exec_jalr(hart, inst);
 
                 goto done;
         // B 6
@@ -44,32 +44,32 @@ int vm_dispatch(VM *vm, Instruction inst) {
                 switch (funct3) {
                 // BEQ
                 case 0x0: // 0b000
-                        exec_beq(vm, inst);
+                        exec_beq(hart, inst);
 
                         goto done;
                 // BNE
                 case 0x1: // 0b001
-                        exec_bne(vm, inst);
+                        exec_bne(hart, inst);
 
                         goto done;
                 // BLT
                 case 0x4: // 0b100
-                        exec_blt(vm, inst);
+                        exec_blt(hart, inst);
 
                         goto done;
                 // BGE
                 case 0x5: // 0b101
-                        exec_bge(vm, inst);
+                        exec_bge(hart, inst);
 
                         goto done;
                 // BLTU
                 case 0x6: // 0b110
-                        exec_bltu(vm, inst);
+                        exec_bltu(hart, inst);
 
                         goto done;
                 // BGEU
                 case 0x7: // 0b111
-                        exec_bgeu(vm, inst);
+                        exec_bgeu(hart, inst);
 
                         goto done;
                 }
@@ -80,27 +80,27 @@ int vm_dispatch(VM *vm, Instruction inst) {
                 switch (funct3) {
                 // LB
                 case 0x0: // 0b000
-                        exec_lb(vm, inst);
+                        exec_lb(hart, inst);
 
                         goto done;
                 // LH
                 case 0x1: // 0b001
-                        exec_lh(vm, inst);
+                        exec_lh(hart, inst);
 
                         goto done;
                 // LW
                 case 0x2: // 0b010
-                        exec_lw(vm, inst);
+                        exec_lw(hart, inst);
 
                         goto done;
                 // LBU
                 case 0x4: // 0b100
-                        exec_lbu(vm, inst);
+                        exec_lbu(hart, inst);
 
                         goto done;
                 // LHU
                 case 0x5: // 0b101
-                        exec_lhu(vm, inst);
+                        exec_lhu(hart, inst);
 
                         goto done;
                 }
@@ -111,17 +111,17 @@ int vm_dispatch(VM *vm, Instruction inst) {
                 switch (funct3) {
                 // SB
                 case 0x0: // 0b000
-                        exec_sb(vm, inst);
+                        exec_sb(hart, inst);
 
                         goto done;
                 // SH
                 case 0x1: // 0b001
-                        exec_sh(vm, inst);
+                        exec_sh(hart, inst);
 
                         goto done;
                 // SW
                 case 0x2: // 0b010
-                        exec_sw(vm, inst);
+                        exec_sw(hart, inst);
 
                         goto done;
                 }
@@ -133,32 +133,32 @@ int vm_dispatch(VM *vm, Instruction inst) {
                 // I 6
                 // ADDI
                 case 0x0: // 0b000
-                        exec_addi(vm, inst);
+                        exec_addi(hart, inst);
 
                         goto done;
                 // SLTI
                 case 0x2: // 0b010
-                        exec_slti(vm, inst);
+                        exec_slti(hart, inst);
 
                         goto done;
                 // SLTIU
                 case 0x3: // 0b011
-                        exec_sltiu(vm, inst);
+                        exec_sltiu(hart, inst);
 
                         goto done;
                 // XORI
                 case 0x4: // 0b100
-                        exec_xori(vm, inst);
+                        exec_xori(hart, inst);
 
                         goto done;
                 // ORI
                 case 0x6: // 0b110
-                        exec_ori(vm, inst);
+                        exec_ori(hart, inst);
 
                         goto done;
                 // ANDI
                 case 0x7: // 0b111
-                        exec_andi(vm, inst);
+                        exec_andi(hart, inst);
 
                         goto done;
                 // R 3
@@ -166,7 +166,7 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLLI
                         case 0x0: // 0b0000000
-                                exec_slli(vm, inst);
+                                exec_slli(hart, inst);
 
                                 goto done;
                         }
@@ -176,12 +176,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SRLI
                         case 0x0: // 0b0000000
-                                exec_srli(vm, inst);
+                                exec_srli(hart, inst);
 
                                 goto done;
                         // SRAI
                         case 0x20: // 0b0100000
-                                exec_srai(vm, inst);
+                                exec_srai(hart, inst);
 
                                 goto done;
                         }
@@ -197,17 +197,17 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // ADD
                         case 0x00: // 0b0000000
-                                exec_add(vm, inst);
+                                exec_add(hart, inst);
 
                                 goto done;
                         // MUL
                         case 0x01: // 0b0000001
-                                exec_mul(vm, inst);
+                                exec_mul(hart, inst);
 
                                 goto done;
                         // SUB
                         case 0x20: // 0b0100000
-                                exec_sub(vm, inst);
+                                exec_sub(hart, inst);
 
                                 goto done;
                         }
@@ -217,12 +217,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLL
                         case 0x00: // 0b0000000
-                                exec_sll(vm, inst);
+                                exec_sll(hart, inst);
 
                                 goto done;
                         // MULH
                         case 0x01: // 0b0000001
-                                exec_mulh(vm, inst);
+                                exec_mulh(hart, inst);
 
                                 goto done;
                         }
@@ -232,12 +232,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLT
                         case 0x00: // 0b0000000
-                                exec_slt(vm, inst);
+                                exec_slt(hart, inst);
 
                                 goto done;
                         // MULHSU
                         case 0x01: // 0b0000001
-                                exec_mulhsu(vm, inst);
+                                exec_mulhsu(hart, inst);
 
                                 goto done;
                         }
@@ -247,12 +247,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SLTU
                         case 0x00: // 0b0000000
-                                exec_sltu(vm, inst);
+                                exec_sltu(hart, inst);
 
                                 goto done;
                         // MULHU
                         case 0x01: // 0b0000001
-                                exec_mulhu(vm, inst);
+                                exec_mulhu(hart, inst);
 
                                 goto done;
                         }
@@ -262,12 +262,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // XOR
                         case 0x00: // 0b0000000
-                                exec_xor(vm, inst);
+                                exec_xor(hart, inst);
 
                                 goto done;
                         // DIV
                         case 0x01: // 0b0000001
-                                exec_div(vm, inst);
+                                exec_div(hart, inst);
 
                                 goto done;
                         }
@@ -277,17 +277,17 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // SRL
                         case 0x00: // 0b0000000
-                                exec_srl(vm, inst);
+                                exec_srl(hart, inst);
 
                                 goto done;
                         // DIVU
                         case 0x01: // 0b0000001
-                                exec_divu(vm, inst);
+                                exec_divu(hart, inst);
 
                                 goto done;
                         // SRA
                         case 0x20: // 0b0100000
-                                exec_sra(vm, inst);
+                                exec_sra(hart, inst);
 
                                 goto done;
                         }
@@ -297,12 +297,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // OR
                         case 0x00: // 0b0000000
-                                exec_or(vm, inst);
+                                exec_or(hart, inst);
 
                                 goto done;
                         // REM
                         case 0x01: // 0b0000001
-                                exec_rem(vm, inst);
+                                exec_rem(hart, inst);
 
                                 goto done;
                         }
@@ -312,12 +312,12 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         switch (funct7) {
                         // AND
                         case 0x00: // 0b0000000
-                                exec_and(vm, inst);
+                                exec_and(hart, inst);
 
                                 goto done;
                         // REMU
                         case 0x01: // 0b0000001
-                                exec_remu(vm, inst);
+                                exec_remu(hart, inst);
 
                                 goto done;
                         }
@@ -372,7 +372,7 @@ int vm_dispatch(VM *vm, Instruction inst) {
                             && rs1 == 0x0   // 0b00000
                             && imm_i == 0x0 // 0b000000000000
                         ) {
-                                handle_ecall(vm);
+                                handle_ecall(hart);
 
                                 goto done;
                         }
@@ -388,32 +388,32 @@ int vm_dispatch(VM *vm, Instruction inst) {
                         break;
                 // CSRRW
                 case 0x01: // 0b001
-                        exec_csrrw(vm, inst);
+                        exec_csrrw(hart, inst);
 
                         goto done;
                 // CSRRS
                 case 0x02: // 0b010
-                        exec_csrrs(vm, inst);
+                        exec_csrrs(hart, inst);
 
                         goto done;
                 // CSRRC
                 case 0x03: // 0b011
-                        exec_csrrc(vm, inst);
+                        exec_csrrc(hart, inst);
 
                         goto done;
                 // CSRRWI
                 case 0x05: // 0b101
-                        exec_csrrwi(vm, inst);
+                        exec_csrrwi(hart, inst);
 
                         goto done;
                 // CSRRSI
                 case 0x06: // 0b110
-                        exec_csrrsi(vm, inst);
+                        exec_csrrsi(hart, inst);
 
                         goto done;
                 // CSRRCI
                 case 0x07: // 0b111
-                        exec_csrrci(vm, inst);
+                        exec_csrrci(hart, inst);
 
                         goto done;
                 }
@@ -424,7 +424,7 @@ int vm_dispatch(VM *vm, Instruction inst) {
         return 1;
 
 done:
-        vm_pc_write(vm, vm->pc_next);
+        hart_pc_write(hart, hart->pc_next);
 
         return 0;
 }

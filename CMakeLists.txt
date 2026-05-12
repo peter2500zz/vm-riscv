@@ -6,14 +6,19 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(vm
+        # 主函数
         src/main.c
-        src/vm/spec/vm.c
-        src/vm/privileged/vm.c
+        # 虚拟机
+        src/vm/machine.c
+        src/vm/hart//unprivileged.c
+        src/vm/hart//privileged.c
+        # 调度器
         src/dispatcher/root.c
-        src/modules/i/exec.c
-        src/modules/m/exec.c
-        src/modules/ecall/exec.c
-        src/modules/zicsr/exec.c
+        # 扩展
+        src/extensions/i/exec.c
+        src/extensions/m/exec.c
+        src/extensions/ecall/exec.c
+        src/extensions/zicsr/exec.c
 )
 
 target_compile_options(vm PRIVATE

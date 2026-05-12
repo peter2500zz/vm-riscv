@@ -1,7 +1,7 @@
 #ifndef ZICSR_EXEC_H
 #define ZICSR_EXEC_H
 
-#include "../../vm/spec/vm.h"
+#include "../../vm/hart/unprivileged.h"
 
 /**
  * @brief
@@ -10,10 +10,10 @@
  * rs1中的初始值被写到 CSR。如 果
  * rd=x0，那么指令不应当读CSR，也不应当引起任何可能在读 CSR 时发生的副作用。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrw(VM *vm, Instruction inst);
+void exec_csrrw(Hart *hart, Instruction inst);
 
 /**
  * @brief
@@ -23,10 +23,10 @@ void exec_csrrw(VM *vm, Instruction inst);
  * 中为高的位将引起 CSR 中对应的位（如果它可写的话）被设置。 CSR
  * 中的其它位不会被显式地写入。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrs(VM *vm, Instruction inst);
+void exec_csrrs(Hart *hart, Instruction inst);
 
 /**
  * @brief
@@ -36,10 +36,10 @@ void exec_csrrs(VM *vm, Instruction inst);
  * 中为高的位将引起 CSR 中对应的位（如果它是可写的话）被清除。 CSR
  * 中的其它位不会被显式地写入。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrc(VM *vm, Instruction inst);
+void exec_csrrc(Hart *hart, Instruction inst);
 
 /**
  * @brief
@@ -48,10 +48,10 @@ void exec_csrrc(VM *vm, Instruction inst);
  * 位，然后写到整数寄存器 rd。 如果 rd=x0，则不读取 CSR，也不引起任何读 CSR
  * 时可能发生的副作用。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrwi(VM *vm, Instruction inst);
+void exec_csrrwi(Hart *hart, Instruction inst);
 
 /**
  * @brief
@@ -61,10 +61,10 @@ void exec_csrrwi(VM *vm, Instruction inst);
  * 中对应的位（如果可写）被设置，其它位不会被显式写入。 若立即数为零，则不写入
  * CSR，也不引起任何写 CSR 时可能发生的副作用。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrsi(VM *vm, Instruction inst);
+void exec_csrrsi(Hart *hart, Instruction inst);
 
 /**
  * @brief
@@ -74,9 +74,9 @@ void exec_csrrsi(VM *vm, Instruction inst);
  * 中对应的位（如果可写）被清除，其它位不会被显式写入。 若立即数为零，则不写入
  * CSR，也不引起任何写 CSR 时可能发生的副作用。
  *
- * @param vm 虚拟机实例指针
+ * @param hart 硬件线程指针
  * @param inst 指令
  */
-void exec_csrrci(VM *vm, Instruction inst);
+void exec_csrrci(Hart *hart, Instruction inst);
 
 #endif // ZICSR_EXEC_H
