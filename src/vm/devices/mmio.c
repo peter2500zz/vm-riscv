@@ -10,7 +10,7 @@ typedef struct {
 
 static DeviceRegion devices[] = {
     //     { 0x02000000, 0x10000, clint_io },
-    {0x10000000, 0x100, (DeviceIO)handle_uart},
+//     {0x10000000, 0x100, (DeviceIO)handle_uart},
     {0, 0, NULL}, // 终止符
 };
 

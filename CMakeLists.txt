@@ -17,9 +17,15 @@ add_executable(vm
         src/vm/memory/access.c
         # 设备
         src/vm/devices/mmio.c
-        src/vm/devices/uart/handler.c
+        # src/vm/devices/uart/handler.c
         # 调度器
         src/vm/cpu/dispatcher/root.c
+        src/vm/cpu/dispatcher/branch.c
+        src/vm/cpu/dispatcher/load.c
+        src/vm/cpu/dispatcher/store.c
+        src/vm/cpu/dispatcher/op.c
+        src/vm/cpu/dispatcher/opimm.c
+        src/vm/cpu/dispatcher/system.c
         # 扩展
         src/vm/cpu/extensions/i/exec.c
         src/vm/cpu/extensions/m/exec.c
