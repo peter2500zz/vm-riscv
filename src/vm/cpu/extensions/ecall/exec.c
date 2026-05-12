@@ -1,4 +1,5 @@
 #include "exec.h"
+#include "../../../memory/access.h"
 
 void handle_ecall(Hart *hart) {
         int32_t syscall_num = (int32_t)hart_reg_read(hart, 17); // a7
@@ -16,7 +17,9 @@ void handle_ecall(Hart *hart) {
                 uint32_t buffer_len = (uint32_t)(intptr_t)arg2;
 
                 for (uint32_t i = 0; i < buffer_len; i++) {
-                        uint8_t byte = *hart_mem_ptr_byte(hart, buffer_addr + i);
+                        uint8_t byte;
+                        MEM_ACCESS(hart, buffer_addr + i, &byte,
+                                   sizeof(uint8_t), MEM_READ);
                         putchar(byte);
                 }
 

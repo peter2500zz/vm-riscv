@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "vm/hart/unprivileged.h"
 #include "vm/machine.h"
 
 /**
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 初始化虚拟机
-        Machine *machine = machine_new(4, 1 << 20); // 4 harts, 1MiB memory
+        Machine *machine = machine_new(4, 1 << 22); // 4 harts, 4MiB memory
         if (machine == NULL) {
                 fprintf(stderr, "Failed to create machine\n");
                 result = 1;
@@ -76,22 +75,11 @@ int main(int argc, char *argv[]) {
         }
 
         // 硬件线程0加载程序
-        Hart *hart = &machine->harts[0];
-        int load_failed = hart_load_elf(hart, buffer, buffer_size) != 0;
+        machine_init(machine, buffer, buffer_size);
         free(buffer);
-        if (load_failed) {
-                fprintf(stderr, "Failed to load file data into Hart memory\n");
-                result = 1;
-                goto out_free_machine;
-        }
-        hart_reg_write(hart, 2, (hart->mem_size - 16) & ~(uint32_t)0xF);
 
-        printf("==== Hart Started ====\n");
-
-        // 主循环
-        while (1) {
-                hart_step(hart);
-        }
+        // 运行虚拟机
+        machine_go(machine);
 
         // 清理
 out_free_machine:

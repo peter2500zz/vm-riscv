@@ -3,7 +3,17 @@
 
 #include <stdint.h>
 
-#include "../unprivileged/inst.h"
+#include "../unprivileged/types.h"
+
+/**
+ * @brief 特权级别
+ *
+ */
+typedef enum {
+        PRIV_U = 0,
+        PRIV_S = 1,
+        PRIV_M = 3,
+} PrivMode;
 
 typedef union {
         uint32_t addr;

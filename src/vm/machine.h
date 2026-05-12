@@ -1,18 +1,22 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include "hart/unprivileged.h"
+#include "cpu/hart/unprivileged.h"
+#include "memory/types.h"
 #include <stdint.h>
 
 typedef struct {
         Hart *harts;
         uint32_t hart_num;
-        uint8_t *mem;
-        uint32_t mem_size;
+        Memory *mem;
 } Machine;
 
 Machine *machine_new(uint32_t hart_num, uint32_t mem_size);
 
 void machine_free(Machine *machine);
+
+void machine_init(Machine *machine, uint8_t *buffer, uint32_t size);
+
+void machine_go(Machine *machine);
 
 #endif // MACHINE_H

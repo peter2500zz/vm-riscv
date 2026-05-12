@@ -1,7 +1,7 @@
 #ifndef DISPATCHER_ROOT_H
 #define DISPATCHER_ROOT_H
 
-#include "../vm/hart/unprivileged.h"
+#include "../hart/unprivileged.h"
 
 /**
  * @brief 执行一条指令，并改变pc

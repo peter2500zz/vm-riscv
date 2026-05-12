@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "unprivileged/inst.h"
+#include "../../memory/types.h"
+#include "privileged/types.h"
+#include "unprivileged/types.h"
 
 #define HART_REG_NUM 32
 #define HART_CSR_NUM 4096
@@ -28,12 +30,7 @@ typedef struct {
          *
          */
         uint32_t _regs[HART_REG_NUM];
-        uint32_t mem_size;
-        /**
-         * @brief 应当使用 hart_mem_ptr_byte/half/word 来访问 _mem
-         *
-         */
-        uint8_t *_mem;
+        Memory *mem;
 
         // 下为特权模式
 
@@ -43,6 +40,11 @@ typedef struct {
          */
         uint32_t _csr[HART_CSR_NUM];
         char trap_pending;
+        /**
+         * @brief 当前特权模式
+         *
+         */
+        PrivMode priv;
 } Hart;
 
 /**
@@ -53,7 +55,7 @@ typedef struct {
  * @param mem_size 内存大小
  * @return 初始化结果，0表示成功，非0表示失败
  */
-int hart_init(Hart *hart, uint8_t *mem, uint32_t mem_size);
+int hart_init(Hart *hart, Memory *mem);
 
 /**
  * @brief 将当前虚拟机状态打印到标准输出
@@ -79,10 +81,10 @@ static inline uint32_t hart_pc_read(Hart *hart) { return hart->_pc; }
  * @note 自动根据硬件线程内存大小环绕
  */
 static inline void hart_pc_write(Hart *hart, uint32_t value) {
-        if (value >= hart->mem_size) {
+        if (value >= RAM_ADDR + hart->mem->size) {
                 fprintf(stderr,
                         "PC value 0x%08X out of memory bounds (mem_size: %d)\n",
-                        value, hart->mem_size);
+                        value, hart->mem->size);
                 exit(1);
         }
         hart->_pc = value;
@@ -118,83 +120,6 @@ static inline void hart_reg_write(Hart *hart, uint32_t reg_num,
         }
         hart->_regs[reg_num] = value;
 }
-
-/**
- * @brief 从虚拟机内存中取一个字节指针
- *
- * @param hart 硬件线程指针
- * @param addr 起始地址
- * @return 起始地址处的字节指针
- */
-static inline uint8_t *hart_mem_ptr_byte(Hart *hart, uint32_t addr) {
-        if (addr >= hart->mem_size) {
-                fprintf(
-                    stderr,
-                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                    addr, hart->mem_size);
-                exit(1);
-        }
-        return &hart->_mem[addr];
-}
-
-/**
- * @brief 从虚拟机内存中取一个半字指针
- *
- * @param hart 硬件线程指针
- * @param addr 起始地址
- * @return 起始地址处的半字指针
- */
-static inline uint16_t *hart_mem_ptr_half(Hart *hart, uint32_t addr) {
-        // if (addr & 1) {
-        //         fprintf(stderr, "Unaligned half access: 0x%08X\n", addr);
-        //         exit(1);
-        // }
-        if (addr + 1 >= hart->mem_size) {
-                fprintf(
-                    stderr,
-                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                    addr, hart->mem_size);
-                exit(1);
-        }
-        return (uint16_t *)&hart->_mem[addr];
-}
-
-/**
- * @brief 从虚拟机内存中取一个字指针
- *
- * @param hart 硬件线程指针
- * @param addr 起始地址
- * @return 起始地址处的字指针
- */
-static inline uint32_t *hart_mem_ptr_word(Hart *hart, uint32_t addr) {
-        // if (addr & 3) {
-        //         fprintf(stderr, "Unaligned word access: 0x%08X\n", addr);
-        //         exit(1);
-        // }
-        if (addr + 3 >= hart->mem_size) {
-                fprintf(
-                    stderr,
-                    "Memory access out of bounds: 0x%08X (mem_size: 0x%08X)\n",
-                    addr, hart->mem_size);
-                exit(1);
-        }
-        return (uint32_t *)&hart->_mem[addr];
-}
-
-/**
- * @brief 将数据从缓冲区直接拷贝到虚拟机内存
- *
- * @param hart 硬件线程指针
- * @param offset 虚拟机内存中的偏移地址
- * @param buffer 数据缓冲区指针
- * @param size 数据大小
- * @return: 成功返回0，失败返回1
- *
- * @warning 数据大小如果超过虚拟机内存大小，将失败
- */
-int hart_load(Hart *hart, uint32_t offset, uint8_t *buffer, uint32_t size);
-
-int hart_load_elf(Hart *hart, uint8_t *buffer, uint32_t size);
 
 /**
  * @brief 从虚拟机内存中获取PC指向的指令

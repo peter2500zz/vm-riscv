@@ -1,4 +1,5 @@
 #include "exec.h"
+#include "../../../memory/access.h"
 
 void exec_lui(Hart *hart, Instruction inst) {
         uint32_t rd = inst_rd(inst);
@@ -57,7 +58,8 @@ void exec_blt(Hart *hart, Instruction inst) {
         uint32_t rs2 = inst_rs2(inst);
         int32_t imm_b = inst_imm_b(inst);
 
-        if ((int32_t)hart_reg_read(hart, rs1) < (int32_t)hart_reg_read(hart, rs2)) {
+        if ((int32_t)hart_reg_read(hart, rs1) <
+            (int32_t)hart_reg_read(hart, rs2)) {
                 hart->pc_next = hart_pc_read(hart) + (uint32_t)imm_b;
         }
 }
@@ -77,7 +79,8 @@ void exec_bge(Hart *hart, Instruction inst) {
         uint32_t rs2 = inst_rs2(inst);
         int32_t imm_b = inst_imm_b(inst);
 
-        if ((int32_t)hart_reg_read(hart, rs1) >= (int32_t)hart_reg_read(hart, rs2)) {
+        if ((int32_t)hart_reg_read(hart, rs1) >=
+            (int32_t)hart_reg_read(hart, rs2)) {
                 hart->pc_next = hart_pc_read(hart) + (uint32_t)imm_b;
         }
 }
@@ -99,7 +102,10 @@ void exec_lb(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
-        hart_reg_write(hart, rd, (uint32_t)(int8_t)*hart_mem_ptr_byte(hart, addr));
+        int8_t value;
+        MEM_ACCESS(hart, addr, &value, sizeof(int8_t), MEM_READ);
+
+        hart_reg_write(hart, rd, (uint32_t)value);
 }
 
 void exec_lh(Hart *hart, Instruction inst) {
@@ -109,7 +115,10 @@ void exec_lh(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
-        hart_reg_write(hart, rd, (uint32_t)(int16_t)*hart_mem_ptr_half(hart, addr));
+        int16_t value;
+        MEM_ACCESS(hart, addr, &value, sizeof(int16_t), MEM_READ);
+
+        hart_reg_write(hart, rd, (uint32_t)value);
 }
 
 void exec_lw(Hart *hart, Instruction inst) {
@@ -119,7 +128,10 @@ void exec_lw(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
-        hart_reg_write(hart, rd, *hart_mem_ptr_word(hart, addr));
+        int32_t value;
+        MEM_ACCESS(hart, addr, &value, sizeof(int32_t), MEM_READ);
+
+        hart_reg_write(hart, rd, (uint32_t)value);
 }
 
 void exec_lbu(Hart *hart, Instruction inst) {
@@ -129,7 +141,10 @@ void exec_lbu(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
-        hart_reg_write(hart, rd, (uint32_t)*hart_mem_ptr_byte(hart, addr));
+        uint8_t value;
+        MEM_ACCESS(hart, addr, &value, sizeof(uint8_t), MEM_READ);
+
+        hart_reg_write(hart, rd, (uint32_t)value);
 }
 
 void exec_lhu(Hart *hart, Instruction inst) {
@@ -139,7 +154,10 @@ void exec_lhu(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
-        hart_reg_write(hart, rd, (uint32_t)*hart_mem_ptr_half(hart, addr));
+        uint16_t value;
+        MEM_ACCESS(hart, addr, &value, sizeof(uint16_t), MEM_READ);
+
+        hart_reg_write(hart, rd, (uint32_t)value);
 }
 
 void exec_sb(Hart *hart, Instruction inst) {
@@ -149,7 +167,8 @@ void exec_sb(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
-        *hart_mem_ptr_byte(hart, addr) = (uint8_t)hart_reg_read(hart, rs2);
+        uint8_t value = (uint8_t)hart_reg_read(hart, rs2);
+        MEM_ACCESS(hart, addr, &value, sizeof(uint8_t), MEM_WRITE);
 }
 
 void exec_sh(Hart *hart, Instruction inst) {
@@ -159,7 +178,8 @@ void exec_sh(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
-        *hart_mem_ptr_half(hart, addr) = (uint16_t)hart_reg_read(hart, rs2);
+        uint16_t value = (uint16_t)hart_reg_read(hart, rs2);
+        MEM_ACCESS(hart, addr, &value, sizeof(uint16_t), MEM_WRITE);
 }
 
 void exec_sw(Hart *hart, Instruction inst) {
@@ -169,7 +189,8 @@ void exec_sw(Hart *hart, Instruction inst) {
 
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
-        *hart_mem_ptr_word(hart, addr) = hart_reg_read(hart, rs2);
+        uint32_t value = hart_reg_read(hart, rs2);
+        MEM_ACCESS(hart, addr, &value, sizeof(uint32_t), MEM_WRITE);
 }
 
 void exec_addi(Hart *hart, Instruction inst) {
@@ -260,7 +281,7 @@ void exec_srai(Hart *hart, Instruction inst) {
         int32_t offset = imm_i & 0x1F; // 0b11111
 
         hart_reg_write(hart, rd,
-                     (uint32_t)((int32_t)hart_reg_read(hart, rs1) >> offset));
+                       (uint32_t)((int32_t)hart_reg_read(hart, rs1) >> offset));
 }
 
 void exec_add(Hart *hart, Instruction inst) {
@@ -268,7 +289,8 @@ void exec_add(Hart *hart, Instruction inst) {
         uint32_t rs1 = inst_rs1(inst);
         uint32_t rs2 = inst_rs2(inst);
 
-        hart_reg_write(hart, rd, hart_reg_read(hart, rs1) + hart_reg_read(hart, rs2));
+        hart_reg_write(hart, rd,
+                       hart_reg_read(hart, rs1) + hart_reg_read(hart, rs2));
 }
 
 void exec_sub(Hart *hart, Instruction inst) {
@@ -276,7 +298,8 @@ void exec_sub(Hart *hart, Instruction inst) {
         uint32_t rs1 = inst_rs1(inst);
         uint32_t rs2 = inst_rs2(inst);
 
-        hart_reg_write(hart, rd, hart_reg_read(hart, rs1) - hart_reg_read(hart, rs2));
+        hart_reg_write(hart, rd,
+                       hart_reg_read(hart, rs1) - hart_reg_read(hart, rs2));
 }
 
 void exec_sll(Hart *hart, Instruction inst) {
@@ -296,7 +319,8 @@ void exec_slt(Hart *hart, Instruction inst) {
 
         uint32_t value = 0;
 
-        if ((int32_t)hart_reg_read(hart, rs1) < (int32_t)hart_reg_read(hart, rs2)) {
+        if ((int32_t)hart_reg_read(hart, rs1) <
+            (int32_t)hart_reg_read(hart, rs2)) {
                 value = 1;
         }
 
@@ -322,7 +346,8 @@ void exec_xor(Hart *hart, Instruction inst) {
         uint32_t rs1 = inst_rs1(inst);
         uint32_t rs2 = inst_rs2(inst);
 
-        hart_reg_write(hart, rd, hart_reg_read(hart, rs1) ^ hart_reg_read(hart, rs2));
+        hart_reg_write(hart, rd,
+                       hart_reg_read(hart, rs1) ^ hart_reg_read(hart, rs2));
 }
 
 void exec_srl(Hart *hart, Instruction inst) {
@@ -343,7 +368,7 @@ void exec_sra(Hart *hart, Instruction inst) {
         uint32_t offset = hart_reg_read(hart, rs2) & 0x1F; // 0b11111
 
         hart_reg_write(hart, rd,
-                     (uint32_t)((int32_t)hart_reg_read(hart, rs1) >> offset));
+                       (uint32_t)((int32_t)hart_reg_read(hart, rs1) >> offset));
 }
 
 void exec_or(Hart *hart, Instruction inst) {
@@ -351,7 +376,8 @@ void exec_or(Hart *hart, Instruction inst) {
         uint32_t rs1 = inst_rs1(inst);
         uint32_t rs2 = inst_rs2(inst);
 
-        hart_reg_write(hart, rd, hart_reg_read(hart, rs1) | hart_reg_read(hart, rs2));
+        hart_reg_write(hart, rd,
+                       hart_reg_read(hart, rs1) | hart_reg_read(hart, rs2));
 }
 
 void exec_and(Hart *hart, Instruction inst) {
@@ -359,5 +385,6 @@ void exec_and(Hart *hart, Instruction inst) {
         uint32_t rs1 = inst_rs1(inst);
         uint32_t rs2 = inst_rs2(inst);
 
-        hart_reg_write(hart, rd, hart_reg_read(hart, rs1) & hart_reg_read(hart, rs2));
+        hart_reg_write(hart, rd,
+                       hart_reg_read(hart, rs1) & hart_reg_read(hart, rs2));
 }

@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include "privileged/inst.h"
 #include "unprivileged.h"
 
 uint32_t hart_csr_read(Hart *hart, CSR csr);

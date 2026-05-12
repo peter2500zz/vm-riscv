@@ -1,15 +1,14 @@
-#include "../src/dispatcher/root.h"
-#include "../src/vm/hart/unprivileged.h"
+#include "../src/vm/cpu/dispatcher/root.h"
+#include "../src/vm/memory/access.h"
 #include "test_utils.h"
 #include <stdint.h>
 #include <stdlib.h>
 
 int main() {
         // ==== 创建独立 Hart ====
-        uint32_t mem_size = 1024;
-        uint8_t *mem = calloc(1, mem_size);
+        Memory *mem = memory_new(1024);
         Hart *hart = calloc(1, sizeof(Hart));
-        hart_init(hart, mem, mem_size);
+        hart_init(hart, mem);
 
         // MUL
         hart->_pc = 0;
@@ -211,7 +210,7 @@ int main() {
 
         // ==== 释放资源 ====
         free(hart);
-        free(mem);
+        memory_free(mem);
 
         return 0;
 }

@@ -1,6 +1,6 @@
 
 #include "exec.h"
-#include "../../vm/hart/privileged.h"
+#include "../../hart/privileged.h"
 
 void exec_csrrw(Hart *hart, Instruction inst) {
         uint32_t rd = inst_rd(inst);
