@@ -1,7 +1,15 @@
+#include "../src/dispatcher/root.h"
+#include "../src/vm/hart/unprivileged.h"
 #include "test_utils.h"
+#include <stdint.h>
+#include <stdlib.h>
 
-int main(void) {
-        SETUP_HART(5);
+int main() {
+        // ==== 创建独立 Hart ====
+        uint32_t mem_size = 1024;
+        uint8_t *mem = calloc(1, mem_size);
+        Hart *hart = calloc(1, sizeof(Hart));
+        hart_init(hart, mem, mem_size);
 
         // MUL
         hart->_pc = 0;
@@ -200,6 +208,10 @@ int main(void) {
         // remu x12, x10, x11
         hart_dispatch(hart, 0x02b57633);
         ASSERT_EQ(hart->_regs[12], 0x00000000);
+
+        // ==== 释放资源 ====
+        free(hart);
+        free(mem);
 
         return 0;
 }

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "vm/hart/unprivileged.h"
+#include "vm/machine.h"
 
 /**
  * @brief 将给定路径的文件读取入缓冲区
@@ -58,9 +59,9 @@ int main(int argc, char *argv[]) {
         }
 
         // 初始化虚拟机
-        Hart *hart = hart_new(20); // 1MiB memory
-        if (hart == NULL) {
-                fprintf(stderr, "Failed to create Hart\n");
+        Machine *machine = machine_new(4, 1 << 20); // 4 harts, 1MiB memory
+        if (machine == NULL) {
+                fprintf(stderr, "Failed to create machine\n");
                 result = 1;
                 goto out;
         }
@@ -71,16 +72,17 @@ int main(int argc, char *argv[]) {
         if (buffer == NULL) {
                 fprintf(stderr, "Failed to load file: %s\n", argv[1]);
                 result = 1;
-                goto out_free_hart;
+                goto out_free_machine;
         }
 
-        // 读取缓冲区到虚拟机内存
+        // 硬件线程0加载程序
+        Hart *hart = &machine->harts[0];
         int load_failed = hart_load_elf(hart, buffer, buffer_size) != 0;
         free(buffer);
         if (load_failed) {
                 fprintf(stderr, "Failed to load file data into Hart memory\n");
                 result = 1;
-                goto out_free_hart;
+                goto out_free_machine;
         }
         hart_reg_write(hart, 2, (hart->mem_size - 16) & ~(uint32_t)0xF);
 
@@ -92,9 +94,9 @@ int main(int argc, char *argv[]) {
         }
 
         // 清理
-out_free_hart:
-        hart_free(hart);
-        hart = NULL;
+out_free_machine:
+        machine_free(machine);
+        machine = NULL;
 out:
         return result;
 }

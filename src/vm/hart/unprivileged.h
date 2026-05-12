@@ -13,6 +13,8 @@
 /**
  * @brief 硬件线程结构体
  *
+ * @note 内部成员前加下划线表示不应直接访问，应使用提供的函数接口。
+ * 同时，内存生命周期不应由 Hart 负责管理，应由外部提供并保证其有效性。
  */
 typedef struct {
         /**
@@ -44,22 +46,14 @@ typedef struct {
 } Hart;
 
 /**
- * @brief 创建一个新的硬件线程
+ * @brief 初始化硬件线程
  *
- * @param n 内存大小的指数，实际内存大小为2^n字节
- * @return 成功返回指向Hart实例的指针，失败返回NULL
+ * @param hart 硬件线程指针
+ * @param mem 内存指针
+ * @param mem_size 内存大小
+ * @return 初始化结果，0表示成功，非0表示失败
  */
-Hart *hart_new(int n);
-
-/**
- * @brief 释放硬件线程
- *
- * @param hart 要释放的Hart实例指针
- * @return 无返回值
- *
- * @note 无论hart是否为NULL，函数都能安全调用
- */
-void hart_free(Hart *hart);
+int hart_init(Hart *hart, uint8_t *mem, uint32_t mem_size);
 
 /**
  * @brief 将当前虚拟机状态打印到标准输出

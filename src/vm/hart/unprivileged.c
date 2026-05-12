@@ -12,37 +12,13 @@ const char *reg_name[] = {"zero", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
                           "a6",   "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
                           "s8",   "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
-Hart *hart_new(int n) {
-        // 越界
-        if (n < 0 || n > 31) {
-                goto out;
-        }
-        uint32_t size = (uint32_t)1 << n; // 2^n
+int hart_init(Hart *hart, uint8_t *mem, uint32_t mem_size) {
+        int result = 0;
 
-        Hart *hart = calloc(1, sizeof(Hart));
-        if (hart == NULL) {
-                goto out;
-        }
-        hart->mem_size = size;
-        hart->_mem = calloc(1, size);
-        if (hart->_mem == NULL) {
-                goto out_free_hart;
-        }
+        hart->mem_size = mem_size;
+        hart->_mem = mem;
 
-        return hart;
-
-out_free_hart:
-        free(hart);
-out:
-        return NULL;
-}
-
-void hart_free(Hart *hart) {
-        if (hart == NULL) {
-                return;
-        }
-        free(hart->_mem);
-        free(hart);
+        return result;
 }
 
 void hart_debug(Hart *hart) {
@@ -131,7 +107,7 @@ int hart_load_elf(Hart *hart, uint8_t *buffer, uint32_t size) {
                 // 复制文件内容到虚拟地址
                 if (ph->p_filesz > 0) {
                         if (hart_load(hart, ph->p_vaddr, buffer + ph->p_offset,
-                                    ph->p_filesz) != 0) {
+                                      ph->p_filesz) != 0) {
                                 fprintf(stderr, "Failed to load segment %d\n",
                                         i);
                                 return 1;
@@ -144,7 +120,8 @@ int hart_load_elf(Hart *hart, uint8_t *buffer, uint32_t size) {
                         uint32_t bss_size = ph->p_memsz - ph->p_filesz;
                         if (bss_addr + bss_size > hart->mem_size) {
                                 fprintf(stderr,
-                                        "BSS segment %d out of Hart memory\n", i);
+                                        "BSS segment %d out of Hart memory\n",
+                                        i);
                                 return 1;
                         }
                         memset(hart->_mem + bss_addr, 0, bss_size);
@@ -157,7 +134,8 @@ int hart_load_elf(Hart *hart, uint8_t *buffer, uint32_t size) {
 }
 
 Instruction hart_fetch(Hart *hart) {
-        Instruction inst = (Instruction)(*hart_mem_ptr_word(hart, hart_pc_read(hart)));
+        Instruction inst =
+            (Instruction)(*hart_mem_ptr_word(hart, hart_pc_read(hart)));
 
         return inst;
 }
