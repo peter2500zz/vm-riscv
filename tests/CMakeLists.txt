@@ -8,7 +8,8 @@ set(Hart_SOURCES
         ../src/vm/memory/access.c
         # 设备
         ../src/vm/devices/mmio.c
-        # ../src/vm/devices/uart/handler.c
+        ../src/vm/devices/uart/handler.c
+        ../src/vm/devices/clint/handler.c
         # 调度器
         ../src/vm/cpu/dispatcher/root.c
         ../src/vm/cpu/dispatcher/branch.c

@@ -128,15 +128,14 @@ void exec_clui(Hart *hart, CInstruction inst) {
             sign_extend(BIT(inst, 12) << 17 | BITS(inst, 6, 2) << 12, 18);
 
         if (rd == 0) {
-                // C.LUI with rd=0 is HINT
-                return;
+                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                exit(1);
         } else if (rd == 2) {
-                // C.LUI with rd=x2 is C.ADDI16SP
-                // exec_caddi16sp(hart, inst);
-                return;
+                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                exit(1);
         } else if (imm == 0) {
-                // C.LUI with imm=0 is reserved, and must not write to rd
-                return;
+                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                exit(1);
         }
         hart_reg_write(hart, rd, (uint32_t)imm);
 }
@@ -230,6 +229,9 @@ void exec_cmv(Hart *hart, CInstruction inst) {
         hart_reg_write(hart, rd, hart_reg_read(hart, rs2));
         // } else {
         //         exec_cjr(hart, inst);
+        // 
+                // fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                // exit(1);
         // }
 }
 
@@ -239,6 +241,9 @@ void exec_cadd(Hart *hart, CInstruction inst) {
 
         // if (rs2 == 0) {
         //         exec_cjalr(hart, inst);
+
+                // fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                // exit(1);
         // } else {
         hart_reg_write(hart, rd,
                        hart_reg_read(hart, rd) + hart_reg_read(hart, rs2));

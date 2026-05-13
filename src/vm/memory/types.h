@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#define UART_ADDR 0x10000000
 #define RAM_ADDR 0x80000000
 
 #define MAX_MEM_SIZE 0x40000000

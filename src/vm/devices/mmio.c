@@ -1,6 +1,8 @@
 #include "mmio.h"
 // UART
 #include "uart/handler.h"
+// CLINT
+#include "clint/handler.h"
 
 typedef struct {
         uint32_t base;
@@ -9,8 +11,8 @@ typedef struct {
 } DeviceRegion;
 
 static DeviceRegion devices[] = {
-    //     { 0x02000000, 0x10000, clint_io },
-//     {0x10000000, 0x100, (DeviceIO)handle_uart},
+    {CLINT_ADDR, CLINT_SIZE, (DeviceIO)handle_clint},
+    {UART_ADDR, UART_SIZE, (DeviceIO)handle_uart},
     {0, 0, NULL}, // 终止符
 };
 

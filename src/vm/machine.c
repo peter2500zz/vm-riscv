@@ -3,6 +3,8 @@
 #include "memory/access.h"
 #include <stdint.h>
 #include <string.h>
+// tmp
+#include "devices/clint/handler.h"
 
 Machine *machine_new(uint32_t hart_num, uint32_t mem_size) {
         if (hart_num == 0 || mem_size == 0) {
@@ -199,5 +201,12 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
 void machine_go(Machine *machine) {
         while (1) {
                 hart_step(&machine->harts[0]);
+                // 模拟 CLINT 的 MTIME 递增
+                mtime++;
+                if (mtime >= mtimecmp) {
+                        // 触发定时器中断
+                        msip = 1;
+                        machine->harts[0].trap_pending = 1;
+                }
         }
 }
