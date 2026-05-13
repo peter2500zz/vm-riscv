@@ -123,8 +123,9 @@ static void elf_mem_zero(Hart *hart, uint32_t addr, uint32_t size) {
 }
 
 int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
-        Elf32_Ehdr *eh = (Elf32_Ehdr *)buffer;
+        printf("==== machine_load_elf ====\n");
 
+        Elf32_Ehdr *eh = (Elf32_Ehdr *)buffer;
         if (size < sizeof(Elf32_Ehdr)) {
                 fprintf(stderr, "Too small\n");
                 return 1;
@@ -146,6 +147,9 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
                 fprintf(stderr, "Not RISC-V\n");
                 return 1;
         }
+        printf("ELF header OK: 32-bit little-endian RISC-V\n");
+        printf("  e_entry=0x%08x, e_phnum=%d\n", eh->e_entry, eh->e_phnum);
+
         if (eh->e_phoff + (uint32_t)eh->e_phnum * eh->e_phentsize > size) {
                 fprintf(stderr, "Program header out of bounds\n");
                 return 1;
@@ -154,28 +158,41 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
         for (int i = 0; i < eh->e_phnum; i++) {
                 Elf32_Phdr *ph =
                     (Elf32_Phdr *)(buffer + eh->e_phoff + i * eh->e_phentsize);
-                if (ph->p_type != PT_LOAD)
+                if (ph->p_type != PT_LOAD) {
+                        printf("  segment %d: type=0x%x, skipping\n", i,
+                               ph->p_type);
                         continue;
-
+                }
+                printf(
+                    "  segment %d: LOAD vaddr=0x%08x filesz=0x%x memsz=0x%x\n",
+                    i, ph->p_vaddr, ph->p_filesz, ph->p_memsz);
                 if (ph->p_offset + ph->p_filesz > size) {
                         fprintf(stderr, "Segment %d out of buffer\n", i);
                         return 1;
                 }
-
-                if (ph->p_filesz > 0)
+                if (ph->p_filesz > 0) {
+                        printf("    writing 0x%x bytes to vaddr=0x%08x\n",
+                               ph->p_filesz, ph->p_vaddr);
                         elf_mem_write(&machine->harts[0], ph->p_vaddr,
                                       buffer + ph->p_offset, ph->p_filesz);
-
-                if (ph->p_memsz > ph->p_filesz)
+                }
+                if (ph->p_memsz > ph->p_filesz) {
+                        printf("    zeroing 0x%x bytes at vaddr=0x%08x\n",
+                               ph->p_memsz - ph->p_filesz,
+                               ph->p_vaddr + ph->p_filesz);
                         elf_mem_zero(&machine->harts[0],
                                      ph->p_vaddr + ph->p_filesz,
                                      ph->p_memsz - ph->p_filesz);
+                }
         }
 
         machine->harts[0]._pc = eh->e_entry;
-        // 设置栈顶指向 RAM 的末尾
         machine->harts[0]._regs[2] =
             (RAM_ADDR + machine->mem->size) & ~(uint32_t)0xf;
+
+        printf("  pc=0x%08x sp=0x%08x\n", machine->harts[0]._pc,
+               machine->harts[0]._regs[2]);
+        printf("==== machine_load_elf done ====\n");
         return 0;
 }
 

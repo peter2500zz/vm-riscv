@@ -12,14 +12,28 @@
 #include "opimm.h"
 // system 分发器
 #include "system.h"
+// compressed 分发器
+#include "compressed.h"
 
 // i 模块指令
 #include "../extensions/i/exec.h"
 
 int hart_dispatch(Hart *hart, Instruction inst) {
         hart->pc_next = hart_pc_read(hart) + 4;
+        // hart_debug(hart);
+        // printf("PC at 0x%08X: 0x%08X\n", hart_pc_read(hart), inst);
+        // // wait for enter
+        // while (getchar() != '\n')
+        //         ;
 
         uint32_t opcode = inst_opcode(inst);
+
+        if ((opcode & 0x3) != 0x3) {
+                // C 扩展指令
+                dispatch_compressed(hart, (CInstruction)inst);
+
+                goto done;
+        }
 
         switch (opcode) {
         // U LUI

@@ -31,6 +31,7 @@ void handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 handler(hart, addr, target, size, type);
         } else {
                 fprintf(stderr, "No device found for address 0x%08X\n", addr);
+                hart_debug(hart);
                 exit(1);
         }
 }

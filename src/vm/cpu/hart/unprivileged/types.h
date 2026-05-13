@@ -121,4 +121,44 @@ static inline int32_t inst_imm_j(Instruction inst) {
                            21);
 }
 
+// C 扩展
+
+typedef uint16_t CInstruction;
+
+static inline uint32_t cinst_opcode(CInstruction inst) {
+        return (uint32_t)BITS(inst, 1, 0);
+}
+
+static inline uint32_t cinst_r_6_2(CInstruction inst) {
+        return (uint32_t)BITS(inst, 6, 2);
+}
+
+static inline uint32_t cinst_r_11_7(CInstruction inst) {
+        return (uint32_t)BITS(inst, 11, 7);
+}
+
+static inline uint32_t cinst_funct4(CInstruction inst) {
+        return (uint32_t)BITS(inst, 15, 12);
+}
+
+static inline uint32_t cinst_funct3(CInstruction inst) {
+        return (uint32_t)BITS(inst, 15, 13);
+}
+
+static inline uint32_t cinst_r_4_2(CInstruction inst) {
+        return 8 + (uint32_t)BITS(inst, 4, 2);
+}
+
+static inline uint32_t cinst_r_9_7(CInstruction inst) {
+        return 8 + (uint32_t)BITS(inst, 9, 7);
+}
+
+static inline uint32_t cinst_funct2(CInstruction inst) {
+        return BITS(inst, 6, 5);
+}
+
+static inline uint32_t cinst_funct6(CInstruction inst) {
+        return BITS(inst, 15, 10);
+}
+
 #endif // UNPRIVILEGED_INST_H

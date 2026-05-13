@@ -48,11 +48,11 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 }
                 break;
         case sizeof(uint32_t):
-                if (addr & 3) {
-                        fprintf(stderr, "Unaligned word access at 0x%08x\n",
-                                addr);
-                        return;
-                }
+                // if (addr & 3) {
+                //         fprintf(stderr, "Unaligned word access at 0x%08x\n",
+                //                 addr);
+                //         return;
+                // }
                 break;
         }
         if (addr < RAM_ADDR) {
@@ -63,7 +63,8 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
         if (addr >= RAM_ADDR + hart->mem->size) {
                 fprintf(stderr, "Accessing out-of-bounds memory at 0x%08x\n",
                         addr);
-                return;
+                hart_debug(hart);
+                exit(1);
         }
         uint32_t offset = addr - RAM_ADDR;
 

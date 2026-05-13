@@ -26,11 +26,13 @@ add_executable(vm
         src/vm/cpu/dispatcher/op.c
         src/vm/cpu/dispatcher/opimm.c
         src/vm/cpu/dispatcher/system.c
+        src/vm/cpu/dispatcher/compressed.c
         # 扩展
         src/vm/cpu/extensions/i/exec.c
         src/vm/cpu/extensions/m/exec.c
         src/vm/cpu/extensions/ecall/exec.c
         src/vm/cpu/extensions/zicsr/exec.c
+        src/vm/cpu/extensions/c/exec.c
 )
 
 target_compile_options(vm PRIVATE
