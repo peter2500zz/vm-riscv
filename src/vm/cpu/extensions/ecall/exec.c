@@ -31,7 +31,7 @@ void handle_ecall(Hart *hart) {
                 exit((int)(intptr_t)arg0);
 
         default:
-                fprintf(stderr, "Unknown syscall: %d\n", syscall_num);
+                fprintf(stderr, "Unknown syscall: %d at 0x%08x\n", syscall_num, hart->_pc);
                 getchar();
                 while (getchar() != '\n')
                         ;

@@ -165,25 +165,29 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
                                ph->p_type);
                         continue;
                 }
-                printf(
-                    "  segment %d: LOAD vaddr=0x%08x filesz=0x%x memsz=0x%x\n",
-                    i, ph->p_vaddr, ph->p_filesz, ph->p_memsz);
+                printf("  segment %d: LOAD vaddr=0x%08x paddr=0x%08x "
+                       "filesz=0x%x memsz=0x%x\n",
+                       i, ph->p_vaddr, ph->p_paddr, ph->p_filesz, ph->p_memsz);
                 if (ph->p_offset + ph->p_filesz > size) {
                         fprintf(stderr, "Segment %d out of buffer\n", i);
                         return 1;
                 }
+                // 段的初始映像放到加载地址(LMA, p_paddr)，而不是运行地址
+                // (VMA, p_vaddr)。裸机启动代码(crt0)会在运行时把 .data
+                // 从 LMA 复制到 VMA、并清零 .bss。对于 p_paddr==p_vaddr
+                // 的段(如 .text)，这没有区别。
                 if (ph->p_filesz > 0) {
-                        printf("    writing 0x%x bytes to vaddr=0x%08x\n",
-                               ph->p_filesz, ph->p_vaddr);
-                        elf_mem_write(&machine->harts[0], ph->p_vaddr,
+                        printf("    writing 0x%x bytes to paddr=0x%08x\n",
+                               ph->p_filesz, ph->p_paddr);
+                        elf_mem_write(&machine->harts[0], ph->p_paddr,
                                       buffer + ph->p_offset, ph->p_filesz);
                 }
                 if (ph->p_memsz > ph->p_filesz) {
-                        printf("    zeroing 0x%x bytes at vaddr=0x%08x\n",
+                        printf("    zeroing 0x%x bytes at paddr=0x%08x\n",
                                ph->p_memsz - ph->p_filesz,
-                               ph->p_vaddr + ph->p_filesz);
+                               ph->p_paddr + ph->p_filesz);
                         elf_mem_zero(&machine->harts[0],
-                                     ph->p_vaddr + ph->p_filesz,
+                                     ph->p_paddr + ph->p_filesz,
                                      ph->p_memsz - ph->p_filesz);
                 }
         }
