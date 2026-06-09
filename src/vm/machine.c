@@ -1,8 +1,10 @@
 #include "machine.h"
+#include "cpu/hart/privileged.h"
 #include "cpu/hart/unprivileged.h"
 #include "memory/access.h"
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 // tmp
 #include "devices/clint/handler.h"
 
@@ -202,15 +204,43 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
         return 0;
 }
 
+uint32_t timebase_freq = 10000000; // 10 MHz
+
 void machine_go(Machine *machine) {
+        Hart *hart = &machine->harts[0];
         while (1) {
-                hart_step(&machine->harts[0]);
-                // 模拟 CLINT 的 MTIME 递增
-                mtime++;
+                hart_step(hart);
+
+                // CLINT：递增 mtime，并据此驱动 mip.MTIP（定时器中断挂起位）。
+                // MTIP 是硬件状态：mtime>=mtimecmp 时置位，handler 写新的
+                // mtimecmp 后自动清除。
+                // mtime++;
+                struct timespec _ts;
+                clock_gettime(CLOCK_MONOTONIC, &_ts);
+                mtime = (uint32_t)(((uint64_t)_ts.tv_sec * 1000000000ULL +
+                                    (uint64_t)_ts.tv_nsec) *
+                                   timebase_freq / 1000000000ULL);
                 if (mtime >= mtimecmp) {
-                        // 触发定时器中断
-                        msip = 1;
-                        machine->harts[0].trap_pending = 1;
+                        hart->_csr[CSR_MIP] |= MIP_MTIP;
+                } else {
+                        hart->_csr[CSR_MIP] &= ~MIP_MTIP;
+                }
+
+                // 投递中断的条件：全局开中断(mstatus.MIE) && 该源使能(mie) &&
+                // 该源挂起(mip)。客户机在临界区里清了 MIE，中断就保持挂起、
+                // 不投递，直到它重新开中断——这样才不会破坏临界区。
+                // 同时 !trap_pending 避免和本步刚产生的同步异常(ecall)相撞。
+                mstatus_t ms;
+                ms.raw = hart->_csr[CSR_MSTATUS];
+                uint32_t irq = hart->_csr[CSR_MIE] & hart->_csr[CSR_MIP];
+                if (!hart->trap_pending && ms.MIE && (irq & MIP_MTIP)) {
+                        hart_trap_sync(hart, CAUSE_MTI, 0);
+                }
+
+                // 应用 trap 跳转（同步异常或上面投递的定时器中断）。
+                if (hart->trap_pending) {
+                        hart->trap_pending = 0;
+                        hart->_pc = hart->pc_next;
                 }
         }
 }

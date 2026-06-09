@@ -71,9 +71,15 @@ typedef union {
 } mstatus_t;
 
 #define CSR_MSTATUS 0x300 // 机器状态寄存器。
+#define CSR_MIE 0x304     // 机器中断使能。
 #define CSR_MTVEC 0x305   // 机器陷阱处理程序基地址。
 #define CSR_MEPC 0x341    // 机器异常程序计数器。
 #define CSR_MCAUSE 0x342  // 机器陷阱原因。
 #define CSR_MTVAL 0x343   // 机器错误地址或指令。
+#define CSR_MIP 0x344     // 机器中断挂起。
+
+#define MIP_MSIP (1u << 3) // 软件中断位（mie/mip 中均为 bit 3）
+#define MIP_MTIP (1u << 7) // 定时器中断位（mie/mip 中均为 bit 7）
+#define MIP_MEIP (1u << 11) // 外部中断位（mie/mip 中均为 bit 11）
 
 #endif // PRIVILEGED_INST_H

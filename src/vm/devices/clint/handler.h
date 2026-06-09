@@ -3,9 +3,9 @@
 
 #include "../../cpu/hart/unprivileged.h"
 
-uint32_t msip;
-uint64_t mtime;
-uint64_t mtimecmp;
+extern uint32_t msip;
+extern uint64_t mtime;
+extern uint64_t mtimecmp;
 
 #define CLINT_ADDR 0x02000000
 #define CLINT_SIZE 0x10000

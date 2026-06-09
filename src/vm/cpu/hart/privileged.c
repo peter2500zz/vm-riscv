@@ -11,8 +11,10 @@ void hart_trap_sync(Hart *hart, uint32_t cause, uint32_t tval) {
         hart->trap_pending = 1;
 
         // 1. 保存 PC
-        hart->_csr[CSR_MEPC] =
-            hart_pc_read(hart) & ~(uint32_t)0x3; // 无C扩展清低两位
+        // mepc 必须保存精确的陷入 PC。RV32 指令至少 2 字节对齐：只有 bit0
+        // 恒为 0；开了 C 扩展后 bit1 可能为 1（指令落在 2 字节边界）。
+        // 绝不能清 bit1，否则恢复时会把地址错位 2 字节，落进上一条指令中间。
+        hart->_csr[CSR_MEPC] = hart_pc_read(hart) & ~(uint32_t)0x1;
 
         // 2. 记录原因
         hart->_csr[CSR_MCAUSE] = cause;
@@ -33,6 +35,6 @@ void hart_trap_sync(Hart *hart, uint32_t cause, uint32_t tval) {
         uint32_t mtvec = hart->_csr[CSR_MTVEC];
         uint32_t base = mtvec & ~(uint32_t)0x3;
         hart->pc_next = base; // 同步异常始终跳 BASE
-        printf("Trap: at 0x%08x cause=0x%08x, tval=0x%08x goto 0x%08x\n",
-               hart_pc_read(hart), cause, tval, hart->pc_next);
+        // printf("Trap: at 0x%08x cause=0x%08x, tval=0x%08x goto 0x%08x\n",
+        //        hart_pc_read(hart), cause, tval, hart->pc_next);
 }
