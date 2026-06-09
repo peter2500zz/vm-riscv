@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "../hart/privileged.h"
+
 void dispatch_compressed(Hart *hart, CInstruction inst) {
         uint32_t opcode = cinst_opcode(inst);
         uint32_t funct2 = cinst_funct2(inst);
@@ -182,7 +184,7 @@ void dispatch_compressed(Hart *hart, CInstruction inst) {
         }
 
 illegal_instruction:
-        hart->trap_pending = 1;
+        hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
 done:
         return;
 }

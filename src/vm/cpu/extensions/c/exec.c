@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "../../../cpu/hart/privileged.h"
+
 void exec_clwsp(Hart *hart, CInstruction inst) {
         uint32_t rd = cinst_r_11_7(inst);
         uint32_t imm =
@@ -155,7 +157,7 @@ void exec_caddi16sp(Hart *hart, CInstruction inst) {
 
         if (imm == 0) {
                 // C.ADDI4SPN with imm=0 is reserved, and must not write to rd
-                hart->trap_pending = 1;
+                hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
                 return;
         }
 
@@ -169,7 +171,7 @@ void exec_caddi4spn(Hart *hart, CInstruction inst) {
 
         if (imm == 0) {
                 // C.ADDI4SPN with imm=0 is reserved, and must not write to rd
-                hart->trap_pending = 1;
+                hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
                 return;
         }
 

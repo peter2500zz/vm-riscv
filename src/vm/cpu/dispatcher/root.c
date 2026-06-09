@@ -18,7 +18,10 @@
 // i 模块指令
 #include "../extensions/i/exec.h"
 
+#include "../hart/privileged.h"
+
 int hart_dispatch(Hart *hart, Instruction inst) {
+        hart->trap_pending = 0;
         hart->pc_next = hart_pc_read(hart) + 4;
         // hart_debug(hart);
         // printf("PC at 0x%08X: 0x%08X\n", hart_pc_read(hart), inst);
@@ -125,15 +128,9 @@ int hart_dispatch(Hart *hart, Instruction inst) {
                 goto done;
         }
 
-        hart->trap_pending = 1;
+        hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
 
 done:
-        if (hart->trap_pending) {
-                hart->trap_pending = 0;
-
-                return 1;
-        }
-
         hart_pc_write(hart, hart->pc_next);
 
         return 0;

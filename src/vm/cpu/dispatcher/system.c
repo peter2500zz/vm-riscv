@@ -1,6 +1,8 @@
 #include "system.h"
-#include "../extensions/ecall/exec.h"
+#include "../extensions/system/exec.h"
 #include "../extensions/zicsr/exec.h"
+
+#include "../hart/privileged.h"
 
 void dispatch_system(Hart *hart, Instruction inst) {
         uint32_t rd = inst_rd(inst);
@@ -15,7 +17,7 @@ void dispatch_system(Hart *hart, Instruction inst) {
                     && rs1 == 0x0   // 0b00000
                     && imm_i == 0x0 // 0b000000000000
                 ) {
-                        handle_ecall(hart);
+                        exec_ecall(hart);
 
                         goto done;
                 }
@@ -26,6 +28,15 @@ void dispatch_system(Hart *hart, Instruction inst) {
                 ) {
 
                         break;
+                }
+                // MRET
+                else if (rd == 0x0       // 0b00000
+                         && rs1 == 0x0   // 0b00000
+                         && imm_i == 0x302 // 0b0000001100000010
+                ) {
+                        exec_mret(hart);
+
+                        goto done;
                 }
 
                 break;
@@ -61,7 +72,7 @@ void dispatch_system(Hart *hart, Instruction inst) {
                 goto done;
         }
 
-        hart->trap_pending = 1;
+        hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
 
 done:
         return;

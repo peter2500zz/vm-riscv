@@ -23,4 +23,6 @@ void hart_csr_write(Hart *hart, CSR csr, uint32_t value);
                         return;                                                \
         } while (0)
 
+void hart_trap_sync(Hart *hart, uint32_t cause, uint32_t tval);
+
 #endif // HART_PRIVILEGED_H

@@ -1,5 +1,7 @@
 #include "../extensions/i/exec.h"
 
+#include "../hart/privileged.h"
+
 void dispatch_opimm(Hart *hart, Instruction inst) {
         uint32_t funct3 = inst_funct3(inst);
         uint32_t funct7 = inst_funct7(inst);
@@ -64,7 +66,7 @@ void dispatch_opimm(Hart *hart, Instruction inst) {
                 break;
         }
 
-        hart->trap_pending = 1;
+        hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
 
 done:
         return;

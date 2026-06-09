@@ -1,6 +1,8 @@
 #include "store.h"
 #include "../extensions/i/exec.h"
 
+#include "../hart/privileged.h"
+
 void dispatch_store(Hart *hart, Instruction inst) {
         uint32_t funct3 = inst_funct3(inst);
 
@@ -22,7 +24,7 @@ void dispatch_store(Hart *hart, Instruction inst) {
                 goto done;
         }
 
-        hart->trap_pending = 1;
+        hart_trap_sync(hart, CAUSE_ILLEGAL_INSTRUCTION, inst);
 
 done:
         return;

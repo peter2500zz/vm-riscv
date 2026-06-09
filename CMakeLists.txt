@@ -31,7 +31,7 @@ add_executable(vm
         # 扩展
         src/vm/cpu/extensions/i/exec.c
         src/vm/cpu/extensions/m/exec.c
-        src/vm/cpu/extensions/ecall/exec.c
+        src/vm/cpu/extensions/system/exec.c
         src/vm/cpu/extensions/zicsr/exec.c
         src/vm/cpu/extensions/c/exec.c
 )
