@@ -57,25 +57,5 @@ Instruction hart_fetch(Hart *hart) {
 void hart_step(Hart *hart) {
         Instruction inst = hart_fetch(hart);
         // printf("opcode: 0x%08X\n", inst_opcode(inst));
-
-        if (hart_dispatch(hart, inst) != 0) {
-                fprintf(stderr, "==== Unknown instruction ====\n");
-                fprintf(stderr, "At 0x%08X\n", hart_pc_read(hart));
-                fprintf(stderr, "Instruction: 0x%08X\n", inst);
-                fprintf(stderr, "\topcode: 0x%02X\n", inst_opcode(inst));
-                fprintf(stderr, "\tfunct3: 0x%02X\n", inst_funct3(inst));
-                fprintf(stderr, "\tfunct7: 0x%02X\n", inst_funct7(inst));
-                fprintf(stderr, "\trd: %d\n", inst_rd(inst));
-                fprintf(stderr, "\trs1: %d\n", inst_rs1(inst));
-                fprintf(stderr, "\trs2: %d\n", inst_rs2(inst));
-                fprintf(stderr, "\timm_i: %d\n", inst_imm_i(inst));
-                fprintf(stderr, "\timm_b: %d\n", inst_imm_b(inst));
-                fprintf(stderr, "\timm_s: %d\n", inst_imm_s(inst));
-                fprintf(stderr, "\timm_u: %d\n", inst_imm_u(inst));
-                fprintf(stderr, "\timm_j: %d\n", inst_imm_j(inst));
-                fprintf(stderr, "\nPress enter to exit.\n");
-
-                getchar();
-                exit(1);
-        }
+        hart_dispatch(hart, inst);
 }

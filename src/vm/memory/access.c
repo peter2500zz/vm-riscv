@@ -1,4 +1,5 @@
 #include "access.h"
+#include "../cpu/hart/privileged.h"
 #include "../devices/mmio.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -35,8 +36,8 @@ void memory_free(Memory *mem) {
         free(mem);
 }
 
-void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                   MemAccessType type) {
+int memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
+                  MemAccessType type) {
         switch (size) {
         case sizeof(uint8_t):
                 break;
@@ -44,7 +45,12 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 if (addr & 1) {
                         fprintf(stderr,
                                 "Unaligned half-word access at 0x%08x\n", addr);
-                        return;
+                        hart_trap_sync(hart,
+                                       type == MEM_READ
+                                           ? CAUSE_MISALIGNED_LOAD
+                                           : CAUSE_MISALIGNED_STORE,
+                                       addr);
+                        return 1;
                 }
                 break;
         case sizeof(uint32_t):
@@ -56,15 +62,16 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 break;
         }
         if (addr < RAM_ADDR) {
-                handle_mmio(hart, addr, target, size, type);
-
-                return;
+                return handle_mmio(hart, addr, target, size, type);
         }
-        if (addr >= RAM_ADDR + hart->mem->size) {
+        if (addr + size > RAM_ADDR + hart->mem->size) {
                 fprintf(stderr, "Accessing out-of-bounds memory at 0x%08x\n",
                         addr);
-                hart_debug(hart);
-                exit(1);
+                hart_trap_sync(hart,
+                               type == MEM_READ ? CAUSE_LOAD_ACCESS
+                                                : CAUSE_STORE_ACCESS,
+                               addr);
+                return 1;
         }
         uint32_t offset = addr - RAM_ADDR;
 
@@ -100,4 +107,5 @@ void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                 }
                 break;
         }
+        return 0;
 }

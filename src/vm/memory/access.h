@@ -9,7 +9,7 @@ Memory *memory_new(uint32_t size);
 
 void memory_free(Memory *mem);
 
-void memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
+int memory_access(Hart *hart, uint32_t addr, void *target, uint32_t size,
                   MemAccessType type);
 
 #define MEM_ACCESS(hart, addr, target, size, type)                             \

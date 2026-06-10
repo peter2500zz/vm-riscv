@@ -6,7 +6,7 @@
 typedef void (*DeviceIO)(Hart *hart, uint32_t addr, void *target, uint32_t size,
                          MemAccessType type);
 
-void handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
+int handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
                  MemAccessType type);
 
 #endif // MMIO_H

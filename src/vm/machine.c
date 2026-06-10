@@ -51,7 +51,7 @@ Machine *machine_new(uint32_t hart_num, uint32_t mem_size) {
 out_free_harts:
         free(machine->harts);
 out_free_mem:
-        free(machine->mem);
+        memory_free(machine->mem);
 out_free_machine:
         free(machine);
         return NULL;
@@ -217,7 +217,7 @@ void machine_go(Machine *machine) {
                 // mtime++;
                 struct timespec _ts;
                 clock_gettime(CLOCK_MONOTONIC, &_ts);
-                mtime = (uint32_t)(((uint64_t)_ts.tv_sec * 1000000000ULL +
+                mtime = (uint64_t)(((uint64_t)_ts.tv_sec * 1000000000ULL +
                                     (uint64_t)_ts.tv_nsec) *
                                    timebase_freq / 1000000000ULL);
                 if (mtime >= mtimecmp) {

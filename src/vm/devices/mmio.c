@@ -4,6 +4,8 @@
 // CLINT
 #include "clint/handler.h"
 
+#include "../cpu/hart/privileged.h"
+
 typedef struct {
         uint32_t base;
         uint32_t size;
@@ -25,15 +27,19 @@ DeviceIO find_device(uint32_t addr) {
         return NULL;
 }
 
-void handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                 MemAccessType type) {
+int handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
+                MemAccessType type) {
 
         DeviceIO handler = find_device(addr);
         if (handler) {
                 handler(hart, addr, target, size, type);
         } else {
                 fprintf(stderr, "No device found for address 0x%08X\n", addr);
-                hart_debug(hart);
-                exit(1);
+                hart_trap_sync(hart,
+                               type == MEM_READ ? CAUSE_MISALIGNED_LOAD
+                                                : CAUSE_MISALIGNED_STORE,
+                               addr);
+                return 1;
         }
+        return 0;
 }
