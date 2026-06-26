@@ -34,6 +34,8 @@ add_executable(vm
         src/vm/cpu/extensions/system/exec.c
         src/vm/cpu/extensions/zicsr/exec.c
         src/vm/cpu/extensions/c/exec.c
+        src/utils/mmioMap.c
+        src/utils/mmioMap.h
 )
 
 target_compile_options(vm PRIVATE
