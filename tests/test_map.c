@@ -33,8 +33,9 @@ int writeWhatAValue(void *value) {
 int main(void) {
         MmioMap *mmioMap = newMmioMap();
 
-        putMmioMap(mmioMap, 0x951, readWhatAValue, writeWhatAValue);
-        putMmioMap(mmioMap, 0x8699, readAlways20, NULL);
+        putReadFuncMmioMap(mmioMap, 0x951, readWhatAValue);
+        putWriteFuncMmioMap(mmioMap, 0x951, writeWhatAValue);
+        putReadFuncMmioMap(mmioMap, 0x8699, readAlways20);
 
         ASSERT_EQ(WHAT_A_VALUE, 30);
 

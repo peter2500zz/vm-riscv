@@ -5,6 +5,7 @@
 #include "mmioMap.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 
 static inline uint32_t hash_u32(uint32_t x) {
         x ^= x >> 16;
@@ -113,8 +114,8 @@ int extendMmioMap(MmioMap *mmioMap) {
         return 0;
 }
 
-int putMmioMap(MmioMap *mmioMap, const uint32_t address, const accessFunc read,
-               const accessFunc write) {
+static int putMmioMap(MmioMap *mmioMap, const uint32_t address,
+                      const accessFunc func, const int isReadFunc) {
         if (mmioMap == NULL) {
                 return 1;
         }
@@ -125,13 +126,22 @@ int putMmioMap(MmioMap *mmioMap, const uint32_t address, const accessFunc read,
 
         // 遍历节点判断是否有重复地址
         while (node != NULL) {
-                // 重复地址直接替换并返回
+                // 重复地址直接替换
                 if (node->address == address) {
-                        node->func.read = read;
-                        node->func.write = write;
+                        if (isReadFunc) {
+                                node->func.read = func;
+                        } else {
+                                node->func.write = func;
+                        }
+                        // TODO: 删除双 NULL 节点
                         return 0;
                 }
                 node = node->next;
+        }
+
+        // 如果 func 是 NULL，则没有必要分配
+        if (func == NULL) {
+                return 0;
         }
 
         // 分配新节点
@@ -141,8 +151,13 @@ int putMmioMap(MmioMap *mmioMap, const uint32_t address, const accessFunc read,
         }
         // 初始化新节点
         newNode->address = address;
-        newNode->func.read = read;
-        newNode->func.write = write;
+        newNode->func.read = NULL;
+        newNode->func.write = NULL;
+        if (isReadFunc) {
+                newNode->func.read = func;
+        } else {
+                newNode->func.write = func;
+        }
 
         // 插入新节点
         newNode->next = mmioMap->buckets[index];
@@ -157,6 +172,16 @@ int putMmioMap(MmioMap *mmioMap, const uint32_t address, const accessFunc read,
         }
 
         return 0;
+}
+
+int putReadFuncMmioMap(MmioMap *mmioMap, const uint32_t address,
+                       const accessFunc readFunc) {
+        return putMmioMap(mmioMap, address, readFunc, 1);
+}
+
+int putWriteFuncMmioMap(MmioMap *mmioMap, const uint32_t address,
+                        const accessFunc writeFunc) {
+        return putMmioMap(mmioMap, address, writeFunc, 0);
 }
 
 static accessFunc getMmioMap(const MmioMap *mmioMap, const uint32_t address,

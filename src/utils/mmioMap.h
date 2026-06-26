@@ -63,17 +63,28 @@ void freeMmioMap(MmioMap **pMmioMap);
 int extendMmioMap(MmioMap *mmioMap);
 
 /**
- * @brief 向 MmioMap 中添加读写函数
+ * @brief 将读函数添加进地址对应位置
  *
  * @param mmioMap MmioMap 实例
  * @param address MMIO 地址
- * @param read 读函数
- * @param write 写函数
+ * @param readFunc 读函数指针
  * @return 非 0 为添加失败
  *
- * @note 如果地址已存在，将覆盖原先值
+ * @note readFunc 为 NULL 可清空已有函数
  */
-int putMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc read, accessFunc write);
+int putReadFuncMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc readFunc);
+
+/**
+ * @brief 将写函数添加进地址对应位置
+ *
+ * @param mmioMap MmioMap 实例
+ * @param address MMIO 地址
+ * @param writeFunc 写函数指针
+ * @return 非 0 为添加失败
+ *
+ * @note writeFunc 为 NULL 可清空已有函数
+ */
+int putWriteFuncMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc writeFunc);
 
 /**
  * @brief 获取读函数
