@@ -149,12 +149,8 @@ int putMmioMap(MmioMap *mmioMap, const uint32_t address, const accessFunc read,
         mmioMap->buckets[index] = newNode;
         mmioMap->nodeCount++;
 
-        // 计算负载因子
-        const float loadFactor =
-            (float)mmioMap->nodeCount / (float)mmioMap->capacity;
-
-        if (loadFactor > 0.75f) {
-                // 扩容桶
+        // 计算负载因子，并在 > 0.75 时扩容桶
+        if (mmioMap->nodeCount * 4 > mmioMap->capacity * 3) {
                 if (extendMmioMap(mmioMap)) {
                         // Failed to extend, what is happening?
                 }

@@ -34,7 +34,7 @@ typedef struct MmioNode {
  */
 typedef struct MmioMap {
         uint32_t capacity;
-        int nodeCount;
+        uint32_t nodeCount;
         MmioNode **buckets;
 } MmioMap;
 
