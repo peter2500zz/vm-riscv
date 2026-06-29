@@ -1,8 +1,8 @@
 
 #include "mmio.h"
 
-#include "clint/init.h"
-#include "uart/init.h"
+#include "../devices/clint/init.h"
+#include "../devices/uart/init.h"
 
 int initMmio(MmioMap *mmioMap) {
         if (initUart(mmioMap))

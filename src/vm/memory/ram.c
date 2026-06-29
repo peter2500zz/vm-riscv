@@ -8,7 +8,7 @@
 
 int read8(Ram *ram, uint32_t address, void *value) {
         uint8_t *data = value;
-        // TODO: 对其
+        // TODO: 对齐
         *data = ram->data[address];
 
         return 0;
@@ -16,7 +16,7 @@ int read8(Ram *ram, uint32_t address, void *value) {
 
 int write8(Ram *ram, uint32_t address, void *value) {
         uint8_t *data = value;
-        // TODO: 对其
+        // TODO: 对齐
         ram->data[address] = *data;
 
         return 0;
@@ -67,12 +67,15 @@ int initRam(Ram *ram) {
                 return 1;
         }
 
+        // 注册 1 字节操作函数
         ram->func[__builtin_ctz(sizeof(uint8_t))].read = &read8;
         ram->func[__builtin_ctz(sizeof(uint8_t))].write = &write8;
 
+        // 注册 2 字节操作函数
         ram->func[__builtin_ctz(sizeof(uint16_t))].read = &read16;
         ram->func[__builtin_ctz(sizeof(uint16_t))].write = &write16;
 
+        // 注册 4 字节操作函数
         ram->func[__builtin_ctz(sizeof(uint32_t))].read = &read32;
         ram->func[__builtin_ctz(sizeof(uint32_t))].write = &write32;
 
