@@ -1,12 +1,12 @@
 #include "../src/vm/cpu/dispatcher/root.h"
-#include "../src/vm/memory/access.h"
+#include "../src/vm/memory/memory.h"
 #include "test_utils.h"
 #include <stdint.h>
 #include <stdlib.h>
 
 int main() {
         // ==== 创建独立 Hart ====
-        Memory *mem = memory_new(1024);
+        Memory *mem = newMemory(1024);
         Hart *hart = calloc(1, sizeof(Hart));
         hart_init(hart, mem);
 
@@ -210,7 +210,7 @@ int main() {
 
         // ==== 释放资源 ====
         free(hart);
-        memory_free(mem);
+        freeMemory(&mem);
 
         return 0;
 }

@@ -1,5 +1,5 @@
 #include "exec.h"
-#include "../../../memory/access.h"
+#include "../../../memory/memory.h"
 
 void exec_lui(Hart *hart, Instruction inst) {
         uint32_t rd = inst_rd(inst);
@@ -103,7 +103,8 @@ void exec_lb(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
         int8_t value;
-        MEM_ACCESS(hart, addr, &value, sizeof(int8_t), MEM_READ);
+        readMemory(hart->mem, addr, &value, sizeof(int8_t));
+        // TODO: trap
 
         hart_reg_write(hart, rd, (uint32_t)value);
 }
@@ -116,7 +117,8 @@ void exec_lh(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
         int16_t value;
-        MEM_ACCESS(hart, addr, &value, sizeof(int16_t), MEM_READ);
+        readMemory(hart->mem, addr, &value, sizeof(int16_t));
+        // TODO: trap
 
         hart_reg_write(hart, rd, (uint32_t)value);
 }
@@ -129,7 +131,8 @@ void exec_lw(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
         int32_t value;
-        MEM_ACCESS(hart, addr, &value, sizeof(int32_t), MEM_READ);
+        readMemory(hart->mem, addr, &value, sizeof(int32_t));
+        // TODO: trap
 
         hart_reg_write(hart, rd, (uint32_t)value);
 }
@@ -142,7 +145,8 @@ void exec_lbu(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
         uint8_t value;
-        MEM_ACCESS(hart, addr, &value, sizeof(uint8_t), MEM_READ);
+        readMemory(hart->mem, addr, &value, sizeof(uint8_t));
+        // TODO: trap
 
         hart_reg_write(hart, rd, (uint32_t)value);
 }
@@ -155,7 +159,8 @@ void exec_lhu(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_i);
 
         uint16_t value;
-        MEM_ACCESS(hart, addr, &value, sizeof(uint16_t), MEM_READ);
+        readMemory(hart->mem, addr, &value, sizeof(uint16_t));
+        // TODO: trap
 
         hart_reg_write(hart, rd, (uint32_t)value);
 }
@@ -168,7 +173,8 @@ void exec_sb(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
         uint8_t value = (uint8_t)hart_reg_read(hart, rs2);
-        MEM_ACCESS(hart, addr, &value, sizeof(uint8_t), MEM_WRITE);
+        writeMemory(hart->mem, addr, &value, sizeof(uint8_t));
+        // TODO: trap
 }
 
 void exec_sh(Hart *hart, Instruction inst) {
@@ -179,7 +185,8 @@ void exec_sh(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
         uint16_t value = (uint16_t)hart_reg_read(hart, rs2);
-        MEM_ACCESS(hart, addr, &value, sizeof(uint16_t), MEM_WRITE);
+        writeMemory(hart->mem, addr, &value, sizeof(uint16_t));
+        // TODO: trap
 }
 
 void exec_sw(Hart *hart, Instruction inst) {
@@ -190,7 +197,8 @@ void exec_sw(Hart *hart, Instruction inst) {
         uint32_t addr = (uint32_t)((int32_t)hart_reg_read(hart, rs1) + imm_s);
 
         uint32_t value = hart_reg_read(hart, rs2);
-        MEM_ACCESS(hart, addr, &value, sizeof(uint32_t), MEM_WRITE);
+        writeMemory(hart->mem, addr, &value, sizeof(uint32_t));
+        // TODO: trap
 }
 
 void exec_addi(Hart *hart, Instruction inst) {

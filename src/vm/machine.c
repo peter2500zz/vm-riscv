@@ -1,7 +1,7 @@
 #include "machine.h"
 #include "cpu/hart/privileged.h"
 #include "cpu/hart/unprivileged.h"
-#include "memory/access.h"
+#include "memory/memory.h"
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
@@ -23,7 +23,7 @@ Machine *machine_new(uint32_t hart_num, uint32_t mem_size) {
         }
 
         // 分配内存
-        machine->mem = memory_new(mem_size);
+        machine->mem = newMemory(mem_size);
         if (machine->mem == NULL) {
                 fprintf(stderr,
                         "Failed to allocate memory for machine memory\n");
@@ -51,7 +51,7 @@ Machine *machine_new(uint32_t hart_num, uint32_t mem_size) {
 out_free_harts:
         free(machine->harts);
 out_free_mem:
-        memory_free(machine->mem);
+        freeMemory(&machine->mem);
 out_free_machine:
         free(machine);
         return NULL;
@@ -65,19 +65,19 @@ void machine_free(Machine *machine) {
         // 释放硬件线程
         free(machine->harts);
         // 释放内存
-        memory_free(machine->mem);
+        freeMemory(&machine->mem);
         // 释放 Machine 结构体
         free(machine);
 }
 
 void machine_load_raw(Machine *machine, uint8_t *buffer, uint32_t size) {
-        memcpy(machine->mem->data, buffer, size);
+        memcpy(machine->mem->ram->data, buffer, size);
 
         // 设置程序计数器指向 RAM 的起始地址
-        machine->harts[0]._pc = RAM_ADDR;
+        machine->harts[0]._pc = RAM_BASE;
         // 设置栈顶指向 RAM 的末尾
         machine->harts[0]._regs[2] =
-            (RAM_ADDR + machine->mem->size) & ~(uint32_t)0xf;
+            (RAM_BASE + machine->mem->ram->size) & ~(uint32_t)0xf;
 }
 
 typedef struct {
@@ -113,16 +113,14 @@ typedef struct {
 static void elf_mem_write(Hart *hart, uint32_t addr, uint8_t *src,
                           uint32_t size) {
         for (uint32_t i = 0; i < size; i++) {
-                memory_access(hart, addr + i, &src[i], sizeof(uint8_t),
-                              MEM_WRITE);
+                writeMemory(hart->mem, addr + i, &src[i], sizeof(uint8_t));
         }
 }
 
 static void elf_mem_zero(Hart *hart, uint32_t addr, uint32_t size) {
         uint8_t zero = 0;
         for (uint32_t i = 0; i < size; i++) {
-                memory_access(hart, addr + i, &zero, sizeof(uint8_t),
-                              MEM_WRITE);
+                writeMemory(hart->mem, addr + i, &zero, sizeof(uint8_t));
         }
 }
 
@@ -196,7 +194,7 @@ int machine_load_elf(Machine *machine, uint8_t *buffer, uint32_t size) {
 
         machine->harts[0]._pc = eh->e_entry;
         machine->harts[0]._regs[2] =
-            (RAM_ADDR + machine->mem->size) & ~(uint32_t)0xf;
+            (RAM_BASE + machine->mem->ram->size) & ~(uint32_t)0xf;
 
         printf("  pc=0x%08x sp=0x%08x\n", machine->harts[0]._pc,
                machine->harts[0]._regs[2]);

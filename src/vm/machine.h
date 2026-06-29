@@ -2,7 +2,7 @@
 #define MACHINE_H
 
 #include "cpu/hart/unprivileged.h"
-#include "memory/types.h"
+#include "memory/memory.h"
 #include <stdint.h>
 
 typedef struct {

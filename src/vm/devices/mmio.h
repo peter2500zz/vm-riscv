@@ -1,12 +1,8 @@
 #ifndef MMIO_H
 #define MMIO_H
 
-#include "../cpu/hart/unprivileged.h"
+#include "../../utils/mmioMap.h"
 
-typedef void (*DeviceIO)(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                         MemAccessType type);
-
-int handle_mmio(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                 MemAccessType type);
+int initMmio(MmioMap *mmioMap);
 
 #endif // MMIO_H

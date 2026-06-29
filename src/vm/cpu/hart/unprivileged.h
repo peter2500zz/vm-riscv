@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../memory/types.h"
+#include "../../memory/memory.h"
 #include "privileged/types.h"
 #include "unprivileged/types.h"
 
@@ -81,9 +81,9 @@ static inline uint32_t hart_pc_read(Hart *hart) { return hart->_pc; }
  * @note 自动根据硬件线程内存大小环绕
  */
 static inline void hart_pc_write(Hart *hart, uint32_t value) {
-        if (value >= RAM_ADDR + hart->mem->size) {
+        if (value >= hart->mem->size) {
                 fprintf(stderr,
-                        "PC value 0x%08X out of memory bounds (mem_size: %d)\n",
+                        "PC value 0x%08X out of memory bounds (mem_size: 0x%08X)\n",
                         value, hart->mem->size);
                 exit(1);
         }

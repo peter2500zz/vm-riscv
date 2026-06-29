@@ -48,6 +48,8 @@ out:
 }
 
 int main(int argc, char *argv[]) {
+        setvbuf(stdout, NULL, _IONBF, 0);
+
         int result = 0;
 
         // 参数解析

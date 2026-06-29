@@ -1,6 +1,6 @@
 #include "exec.h"
 #include "../../../cpu/hart/unprivileged/types.h"
-#include "../../../memory/access.h"
+#include "../../../memory/memory.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -12,8 +12,9 @@ void exec_clwsp(Hart *hart, CInstruction inst) {
             BIT(inst, 12) << 5 | BITS(inst, 6, 4) << 2 | BITS(inst, 3, 2) << 6;
 
         uint32_t value;
-        MEM_ACCESS(hart, hart_reg_read(hart, 2) + imm, &value, sizeof(uint32_t),
-                   MEM_READ);
+        readMemory(hart->mem, hart_reg_read(hart, 2) + imm, &value,
+                   sizeof(uint32_t));
+        // TODO: trap
         hart_reg_write(hart, rd, value);
 }
 
@@ -22,8 +23,9 @@ void exec_cswsp(Hart *hart, CInstruction inst) {
         uint32_t imm = BITS(inst, 12, 9) << 2 | BITS(inst, 8, 7) << 6;
 
         uint32_t value = hart_reg_read(hart, rs2);
-        MEM_ACCESS(hart, hart_reg_read(hart, 2) + imm, &value, sizeof(uint32_t),
-                   MEM_WRITE);
+        writeMemory(hart->mem, hart_reg_read(hart, 2) + imm, &value,
+                    sizeof(uint32_t));
+        // TODO: trap
 }
 
 void exec_clw(Hart *hart, CInstruction inst) {
@@ -33,8 +35,9 @@ void exec_clw(Hart *hart, CInstruction inst) {
             BITS(inst, 12, 10) << 3 | BIT(inst, 6) << 2 | BIT(inst, 5) << 6;
 
         uint32_t value;
-        MEM_ACCESS(hart, hart_reg_read(hart, rs1) + imm, &value,
-                   sizeof(uint32_t), MEM_READ);
+        readMemory(hart->mem, hart_reg_read(hart, rs1) + imm, &value,
+                   sizeof(uint32_t));
+        // TODO: trap
         hart_reg_write(hart, rd, value);
 }
 
@@ -45,8 +48,9 @@ void exec_csw(Hart *hart, CInstruction inst) {
             BITS(inst, 12, 10) << 3 | BIT(inst, 6) << 2 | BIT(inst, 5) << 6;
 
         uint32_t value = hart_reg_read(hart, rs2);
-        MEM_ACCESS(hart, hart_reg_read(hart, rs1) + imm, &value,
-                   sizeof(uint32_t), MEM_WRITE);
+        writeMemory(hart->mem, hart_reg_read(hart, rs1) + imm, &value,
+                    sizeof(uint32_t));
+        // TODO: trap
 }
 
 void exec_cj(Hart *hart, CInstruction inst) {
@@ -130,13 +134,19 @@ void exec_clui(Hart *hart, CInstruction inst) {
             sign_extend(BIT(inst, 12) << 17 | BITS(inst, 6, 2) << 12, 18);
 
         if (rd == 0) {
-                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                fprintf(
+                    stderr,
+                    "Unreachable cuz dispatch should have filtered it out\n");
                 exit(1);
         } else if (rd == 2) {
-                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                fprintf(
+                    stderr,
+                    "Unreachable cuz dispatch should have filtered it out\n");
                 exit(1);
         } else if (imm == 0) {
-                fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
+                fprintf(
+                    stderr,
+                    "Unreachable cuz dispatch should have filtered it out\n");
                 exit(1);
         }
         hart_reg_write(hart, rd, (uint32_t)imm);
@@ -231,9 +241,9 @@ void exec_cmv(Hart *hart, CInstruction inst) {
         hart_reg_write(hart, rd, hart_reg_read(hart, rs2));
         // } else {
         //         exec_cjr(hart, inst);
-        // 
-                // fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
-                // exit(1);
+        //
+        // fprintf(stderr, "Unreachable cuz dispatch should have filtered it
+        // out\n"); exit(1);
         // }
 }
 
@@ -244,8 +254,8 @@ void exec_cadd(Hart *hart, CInstruction inst) {
         // if (rs2 == 0) {
         //         exec_cjalr(hart, inst);
 
-                // fprintf(stderr, "Unreachable cuz dispatch should have filtered it out\n");
-                // exit(1);
+        // fprintf(stderr, "Unreachable cuz dispatch should have filtered it
+        // out\n"); exit(1);
         // } else {
         hart_reg_write(hart, rd,
                        hart_reg_read(hart, rd) + hart_reg_read(hart, rs2));

@@ -1,92 +1,81 @@
+//
+// Created by Peter Shen on 2026/6/26.
+//
+
 #include "handler.h"
+
+#include <stdint.h>
 
 uint32_t msip = 0;
 uint64_t mtime = 0;
 uint64_t mtimecmp = 0xFFFFFFFFFFFFFFFF;
 
-void handle_clint(Hart *hart, uint32_t addr, void *target, uint32_t size,
-                  MemAccessType type) {
-        switch (addr - CLINT_ADDR) {
-        case 0x0000: // MSIP
-                if (size != sizeof(uint32_t)) {
-                        fprintf(stderr, "Invalid access size for MSIP: %u\n",
-                                size);
-                        exit(1);
-                }
-                switch (type) {
-                case MEM_READ:
-                        *(uint32_t *)target = msip;
-                        break;
-                case MEM_WRITE:
-                        msip = *(uint32_t *)target;
-                        break;
-                }
-                break;
-        case 0x4000: // MTIMECMP lo
-                if (size != sizeof(uint32_t)) {
-                        fprintf(stderr,
-                                "Invalid access size for MTIMECMP lo: %u\n",
-                                size);
-                        exit(1);
-                }
-                switch (type) {
-                case MEM_READ:
-                        *(uint32_t *)target = (uint32_t)(mtimecmp & 0xFFFFFFFF);
-                        break;
-                case MEM_WRITE:
-                        mtimecmp = (mtimecmp & 0xFFFFFFFF00000000) |
-                                   *(uint32_t *)target;
-                        break;
-                }
-                break;
-        case 0x4004: // MTIMECMP hi
-                if (size != sizeof(uint32_t)) {
-                        fprintf(stderr,
-                                "Invalid access size for MTIMECMP hi: %u\n",
-                                size);
-                        exit(1);
-                }
-                switch (type) {
-                case MEM_READ:
-                        *(uint32_t *)target = (uint32_t)(mtimecmp >> 32);
-                        break;
-                case MEM_WRITE:
-                        mtimecmp = (mtimecmp & 0xFFFFFFFF) |
-                                   ((uint64_t)(*(uint32_t *)target) << 32);
-                        break;
-                }
-                break;
-        case 0xBFF8: // MTIME lo
-                if (size != sizeof(uint32_t)) {
-                        fprintf(stderr,
-                                "Invalid access size for MTIME lo: %u\n", size);
-                        exit(1);
-                }
-                switch (type) {
-                case MEM_READ:
-                        *(uint32_t *)target = (uint32_t)(mtime & 0xFFFFFFFF);
-                        break;
-                case MEM_WRITE:
-                        mtime =
-                            (mtime & 0xFFFFFFFF00000000) | *(uint32_t *)target;
-                        break;
-                }
-                break;
-        case 0xBFFC: // MTIME hi
-                if (size != sizeof(uint32_t)) {
-                        fprintf(stderr,
-                                "Invalid access size for MTIME hi: %u\n", size);
-                        exit(1);
-                }
-                switch (type) {
-                case MEM_READ:
-                        *(uint32_t *)target = (uint32_t)(mtime >> 32);
-                        break;
-                case MEM_WRITE:
-                        mtime = (mtime & 0xFFFFFFFF) |
-                                ((uint64_t)(*(uint32_t *)target) << 32);
-                        break;
-                }
-                break;
-        }
+int readMSIP(void *target) {
+        uint32_t *data = target;
+        *data = msip;
+
+        return 0;
+}
+
+int writeMSIP(void *target) {
+        uint32_t *data = target;
+        msip = *data;
+
+        return 0;
+}
+
+int readMTIMECMPlo(void *target) {
+        uint32_t *data = target;
+        *data = mtimecmp & 0xFFFFFFFF;
+
+        return 0;
+}
+
+int writeMTIMECMPlo(void *target) {
+        uint32_t *data = target;
+        mtimecmp = (mtimecmp & 0xFFFFFFFF00000000) | *data;
+
+        return 0;
+}
+
+int readMTIMECMPhi(void *target) {
+        uint32_t *data = target;
+        *data = mtimecmp >> 32;
+
+        return 0;
+}
+
+int writeMTIMECMPhi(void *target) {
+        uint32_t *data = target;
+        mtimecmp = (mtimecmp & 0xFFFFFFFF) | ((uint64_t)(*data) << 32);
+
+        return 0;
+}
+
+int readMTIMElo(void *target) {
+        uint32_t *data = target;
+        *data = mtime & 0xFFFFFFFF;
+
+        return 0;
+}
+
+int writeMTIMElo(void *target) {
+        uint32_t *data = target;
+        mtime = (mtime & 0xFFFFFFFF00000000) | *data;
+
+        return 0;
+}
+
+int readMTIMEhi(void *target) {
+        uint32_t *data = target;
+        *data = mtime >> 32;
+
+        return 0;
+}
+
+int writeMTIMEhi(void *target) {
+        uint32_t *data = target;
+        mtime = (mtime & 0xFFFFFFFF) | ((uint64_t)(*data) << 32);
+
+        return 0;
 }

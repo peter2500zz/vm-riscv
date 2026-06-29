@@ -33,26 +33,30 @@ int writeWhatAValue(void *value) {
 int main(void) {
         MmioMap *mmioMap = newMmioMap();
 
-        putReadFuncMmioMap(mmioMap, 0x951, readWhatAValue);
-        putWriteFuncMmioMap(mmioMap, 0x951, writeWhatAValue);
-        putReadFuncMmioMap(mmioMap, 0x8699, readAlways20);
+        putReadFuncMmioMap(mmioMap, 0x951, readWhatAValue, sizeof(uint32_t));
+        putWriteFuncMmioMap(mmioMap, 0x951, writeWhatAValue, sizeof(uint32_t));
+        putReadFuncMmioMap(mmioMap, 0x8699, readAlways20, sizeof(uint32_t));
 
         ASSERT_EQ(WHAT_A_VALUE, 30);
 
         uint32_t myVal = 144;
-        accessFunc readWtv = getReadFuncMmioMap(mmioMap, 0x951);
+        mmioAccessFunc readWtv =
+            getReadFuncMmioMap(mmioMap, 0x951, sizeof(uint32_t));
         readWtv(&myVal);
         ASSERT_EQ(myVal, 30);
 
-        accessFunc writeWtv = getWriteFuncMmioMap(mmioMap, 0x951);
+        mmioAccessFunc writeWtv =
+            getWriteFuncMmioMap(mmioMap, 0x951, sizeof(uint32_t));
         myVal = 666;
         writeWtv(&myVal);
         ASSERT_EQ(WHAT_A_VALUE, 666);
 
-        accessFunc voidFunc = getWriteFuncMmioMap(mmioMap, 0x8699);
+        mmioAccessFunc voidFunc =
+            getWriteFuncMmioMap(mmioMap, 0x8699, sizeof(uint32_t));
         ASSERT_EQ(voidFunc, NULL);
 
-        accessFunc alwaysFunc = getReadFuncMmioMap(mmioMap, 0x8699);
+        mmioAccessFunc alwaysFunc =
+            getReadFuncMmioMap(mmioMap, 0x8699, sizeof(uint32_t));
         alwaysFunc(&myVal);
         ASSERT_EQ(myVal, 20);
 

@@ -13,7 +13,7 @@
  *
  * 对于写函数，传入指针中的值将会被写入目标
  */
-typedef int (*accessFunc)(void *);
+typedef int (*mmioAccessFunc)(void *target);
 
 /**
  * @brief MMIO 地址单元
@@ -21,9 +21,9 @@ typedef int (*accessFunc)(void *);
 typedef struct MmioNode {
         uint32_t address;
         struct {
-                accessFunc read;
-                accessFunc write;
-        } func;
+                mmioAccessFunc read;
+                mmioAccessFunc write;
+        } func[3];
         struct MmioNode *next;
 } MmioNode;
 
@@ -50,9 +50,9 @@ MmioMap *newMmioMap(void);
 /**
  * @brief 释放一个 MmioMap 和其中所有的值，并将指针置为 NULL
  *
- * @param pMmioMap 指向 MmioMap 实例的指针
+ * @param ppMmioMap 指向 MmioMap 实例的指针
  */
-void freeMmioMap(MmioMap **pMmioMap);
+void freeMmioMap(MmioMap **ppMmioMap);
 
 /**
  * @brief 将一个 MmioMap 扩容到当前的两倍大小
@@ -68,11 +68,13 @@ int extendMmioMap(MmioMap *mmioMap);
  * @param mmioMap MmioMap 实例
  * @param address MMIO 地址
  * @param readFunc 读函数指针
+ * @param size 操作字节数
  * @return 非 0 为添加失败
  *
  * @note readFunc 为 NULL 可清空已有函数
  */
-int putReadFuncMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc readFunc);
+int putReadFuncMmioMap(MmioMap *mmioMap, uint32_t address, mmioAccessFunc readFunc,
+                       uint32_t size);
 
 /**
  * @brief 将写函数添加进地址对应位置
@@ -80,28 +82,34 @@ int putReadFuncMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc readFunc);
  * @param mmioMap MmioMap 实例
  * @param address MMIO 地址
  * @param writeFunc 写函数指针
+ * @param size 操作字节数
  * @return 非 0 为添加失败
  *
  * @note writeFunc 为 NULL 可清空已有函数
  */
-int putWriteFuncMmioMap(MmioMap *mmioMap, uint32_t address, accessFunc writeFunc);
+int putWriteFuncMmioMap(MmioMap *mmioMap, uint32_t address,
+                        mmioAccessFunc writeFunc, uint32_t size);
 
 /**
  * @brief 获取读函数
  *
  * @param mmioMap MmioMap 实例
  * @param address MMIO 地址
+ * @param size 操作字节数
  * @return 读函数，不存在或获取失败时为 NULL
  */
-accessFunc getReadFuncMmioMap(const MmioMap *mmioMap, uint32_t address);
+mmioAccessFunc getReadFuncMmioMap(const MmioMap *mmioMap, uint32_t address,
+                              uint32_t size);
 
 /**
  * @brief 获取写函数
  *
  * @param mmioMap MmioMap 实例
  * @param address MMIO 地址
+ * @param size 操作字节数
  * @return 读函数，不存在或获取失败时为 NULL
  */
-accessFunc getWriteFuncMmioMap(const MmioMap *mmioMap, uint32_t address);
+mmioAccessFunc getWriteFuncMmioMap(const MmioMap *mmioMap, uint32_t address,
+                               uint32_t size);
 
 #endif // VM_RISCV_MMIOMAP_H
